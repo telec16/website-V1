@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Aleatoire</title>
+	</head>
+    <body>
+	<p>De l&apos;al&eacute;atoire est g&eacute;n&eacute;r&eacute; &agrave; partir d&apos;une zener bruyante, et se fait traiter par un PIC pour faire un d&eacute; !</p>
+	<img src="random.png" style="max-width:100%"/>
+	<p>Le circuit est aliment&eacute; en 9V, mais pour que le bruit soit bien visible, il faut une tension de zener plus grande. C&apos;est pourquoi la premi&egrave;re moiti&eacute;e du PCB est d&eacute;di&eacute;e &agrave; un montage charge pump, &agrave; base de 555. Il y a ensuite du filtrage (inductance et condensateur) pour limiter l&apos;ondulation sur le bruit (on limite le bruit sur le bruit, un comble !), ainsi qu&apos;un 7805 pour la partie logique.</p>
+	<p>Puis vient la zener et un condensateur bloqueur de DC (le bruit reste tr&egrave;s faible et se fait &eacute;craser par la grande composante continue).</p>
+	<p>On a ensuite un b&ecirc;te ampli et un potentiom&egrave;tre pour regler l&apos;&eacute;quit&eacute; du signal de sortie : il faut que les deux LEDs, mont&eacute;es en oppos&eacute;, brille de la m&ecirc;me fa&ccedil;on pour &ecirc;tre &eacute;quilibr&eacute;.</p>
+	<img src="display.png" style="max-width:100%"/>
+	<p>Le signal va alors dans un PIC16F628, o&ugrave; en seront tir&eacute;es plusieurs fonctions, comme le montre ce bout de code : <code>typedef enum{
+    D2, D3, D4, D6, D10, D12, D20, D100, DEXA,
+    CHRONO
+} MODE_t;</code></p>
+	<img src="back.png" style="max-width:100%"/>
+	<p>L&apos;arri&egrave;re n&apos;est pas si moche que &ccedil;a (j&apos;ai fait bien pire)...</p>
+    </body>
+</html>

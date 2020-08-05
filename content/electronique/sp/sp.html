@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Super probe</title>
+	</head>
+    <body>
+	<p>L'id&eacute;e de me faire une sonde logique me trottait dans la t&ecirc;te depuis pas mal de temps, mais tant qu'&agrave; faire, autant en faire une bien compl&egrave;te !</p>
+	<p>Je suis donc partie sur cette liste de fonctionnalit&eacute;e:</p>
+	<ul>
+	<li>Voltmetre</li>
+	<li>Frequencemetre</li>
+	<li>Compteur</li>
+	<li>Thermometre</li>
+	<li>Capacimetre</li>
+	<li>Et d'autres pas encores implent&eacute;es...</li>
+	</ul>
+	<p>Encore une fois, le projet a &eacute;t&eacute; fait sur papier et perfboard, je n'ai donc pas de sch&eacute;ma num&eacute;rique &agrave; vous proposer...</p>
+	<div style="text-align:center"><a href="schema.png"><img src="schema.png" width="234" height="153" border="0" /></a></div>
+	<div style="text-align:center"><a href="implementation.png"><img src="implementation.png" width="229" height="223" border="0" /></a></div>
+	<p>Pour la sonde logique en elle m&ecirc;me, l'id&eacute;e est de comparer le signal d'entr&eacute;e &agrave; des niveau logiques haut et bas, pour avoir trois possibilit&eacute;s : Haut, Bas, Flottant. Un pont diviseur peut &ecirc;tre rejouter au travers d'un bouton pour v&eacute;rifier l'&eacute;tat flottant.</p>
+	<p>La mesure du condensateur se fait en le d&eacute;chargeant puis en regardant son temps de charge &agrave; 63%</p>
+	<p>Quelques photos de la sonde finie :</p>
+	<div style="text-align:center"><a href="dessus.png"><img src="dessus.png" width="362" height="141" border="0" /></a></div>
+	<div style="text-align:center"><a href="voltmetre.png"><img src="voltmetre.png" width="334" height="117" border="0" /></a></div>
+	<div style="text-align:center"><a href="thermometre.png"><img src="thermometre.png" width="298" height="100" border="0" /></a></div>
+	<p>On peut remarquer le bouton de test flottant et les broches de programmation sur le dessus.</p>
+	<p>Le code est en t&eacute;l&eacute;chargement, mais aussi sur <a href="https://github.com/telec16/super-probe">mon github</a> !</p>
+	<p>Il me semble assez clair, mais je n'ai pas trop mis de commentaires... N'h&eacute;sitez pas &agrave; me demander s'il y a des choses tordues.</p>
+    </body>
+</html>

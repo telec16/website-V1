@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset
+      xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+
+	<url>
+		<loc>http://telec16.fr/</loc>
+		<lastmod>2018-04-13</lastmod>
+		<changefreq>weekly</changefreq>
+		<priority>1.0</priority>
+	</url>
+	
+	
+	
+	<url>
+	  <loc>http://telec16.fr/?p=electronique/aleatoire</loc>
+	  <lastmod>2018-04-13</lastmod>
+		<changefreq>yearly</changefreq>
+	  <priority>0.50</priority>
+	</url>
+	<url>
+	  <loc>http://telec16.fr/?p=electronique/minitel</loc>
+	  <lastmod>2018-04-13</lastmod>
+		<changefreq>yearly</changefreq>
+	  <priority>0.80</priority>
+	</url>
+	<url>
+	  <loc>http://telec16.fr/?p=electronique/sp</loc>
+	  <lastmod>2018-04-13</lastmod>
+		<changefreq>monthly</changefreq>
+	  <priority>0.90</priority>
+	</url>
+	<url>
+	  <loc>http://telec16.fr/?p=electronique/cardmeter</loc>
+	  <lastmod>2018-04-13</lastmod>
+		<changefreq>weekly</changefreq>
+	  <priority>0.90</priority>
+	</url>
+	
+	
+	<url>
+	  <loc>http://telec16.fr/?p=maths/color_solve</loc>
+	  <lastmod>2018-04-13</lastmod>
+		<changefreq>monthly</changefreq>
+	  <priority>0.70</priority>
+	</url>
+	
+	
+	<url>
+	  <loc>http://telec16.fr/?p=divers/chalet</loc>
+	  <lastmod>2018-04-13</lastmod>
+		<changefreq>never</changefreq>
+	  <priority>0.40</priority>
+	</url>
+	<url>
+	  <loc>http://telec16.fr/?p=divers/proj</loc>
+	  <lastmod>2018-04-13</lastmod>
+		<changefreq>yearly</changefreq>
+	  <priority>0.50</priority>
+	</url>
+	
+	
+	<url>
+	  <loc>http://telec16.fr/?p=pratique/bobine</loc>
+	  <lastmod>2018-05-20</lastmod>
+		<changefreq>never</changefreq>
+	  <priority>0.80</priority>
+	</url>
+	<url>
+	  <loc>http://telec16.fr/?p=pratique/print</loc>
+	  <lastmod>2018-05-20</lastmod>
+		<changefreq>never</changefreq>
+	  <priority>0.80</priority>
+	</url>
+	<url>
+	  <loc>http://telec16.fr/?p=pratique/vhdl</loc>
+	  <lastmod>2018-05-20</lastmod>
+		<changefreq>never</changefreq>
+	  <priority>0.80</priority>
+	</url>
+
+</urlset> 

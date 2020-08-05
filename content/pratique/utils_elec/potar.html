@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		
+		<title>Echelle pour potentiom&egrave;tre</title>
+		
+		<link rel="stylesheet" href="/styleADL.css" />
+		<script type='text/javascript' src='../utils.js'></script>
+		<script type='text/javascript'>
+			
+			function setListeners(){
+				var cnv = document.getElementById("out");
+				
+				setDragListener(cnv, mouseMove)
+				
+				function mouseMove(pos){
+					pos.x = pos.x-cnv.width/2;
+					pos.y = -pos.y+cnv.height/2;
+					var angle = Math.atan2(pos.x, pos.y)+3*Math.PI/4;
+					angle = Math.max(0, Math.min(angle, 3*Math.PI/2)) / (3*Math.PI/2);
+					
+					change(angle);
+				}
+			}
+				
+			
+			function prefill(){
+				var v="";
+				
+				switch(document.getElementById("prefill").value){
+					case "div":
+						v="y=5*x/p";
+					break;
+					case "idiv":
+						v="y=5*(p-x)/p";
+					break;
+					case "LT1167":
+						v="y=49.4e3/x+1";
+					break;
+					
+					case "":
+					default:
+					return;
+					break;
+				}
+				
+				document.getElementById("fct").value = v;
+			}
+			
+			function change(angle){
+				p = parseFloat(document.getElementById("pot").value) || 1e3;
+				f = document.getElementById("fct").value || "y=x";
+				s = parseInt(document.getElementById("step").value) || 10;
+				o = parseFloat(document.getElementById("shift").value) || 0;
+				l = document.getElementById("log").checked || false;
+				draw(document.getElementById("out"), f, p, s, o/100, l, angle||0);
+			}
+			
+			function getY(fct, p, isLog, angle){
+					var y;
+					
+					if(!isLog){
+						var x = p*angle;
+					}else{
+						var x = p*(Math.exp(4.39445*angle)-1)/(Math.exp(4.39445)-1);
+					}
+					
+					eval(fct); //y=f(x)
+					
+					return y;
+			}
+			
+			function draw(cnv, fct, p, steps, shift, isLog, knob){
+				var s=Math.min(cnv.height, cnv.width);
+				var ctx = cnv.getContext("2d");
+				var start = 3*Math.PI/4;
+				var end = Math.PI/4;
+				knobAngle = knob*3*Math.PI/2+start;
+				
+				ctx.fillStyle = "#FFFFFF";
+				ctx.fillRect(0, 0, s, s);
+				
+				ctx.beginPath();
+				ctx.globalCompositeOperation = "source-over";
+				ctx.fillStyle = "#000000";
+				ctx.arc(s/2, s/2, .2*s, 0, 2*Math.PI);
+				ctx.fill();
+				
+				var slots=15;
+				for(var i=0; i<slots; i++){
+					ctx.beginPath();
+					ctx.globalCompositeOperation = "lighter";
+					ctx.fillStyle = "#666666";
+					var x=s/2 + .2*s*Math.cos(2*Math.PI*(i+.125)/slots + knobAngle-start);
+					var y=s/2 + .2*s*Math.sin(2*Math.PI*(i+.125)/slots + knobAngle-start);
+					ctx.arc(x, y, s/40, 0, 2*Math.PI);
+					ctx.fill();
+				}
+				
+				ctx.beginPath();
+				ctx.globalCompositeOperation = "lighter";
+				ctx.lineCap = "round";
+				ctx.strokeStyle = "beige";
+				ctx.lineWidth = 3;
+				ctx.moveTo(s/2, s/2);
+				ctx.lineTo(s/2 + .2*s*Math.cos(knobAngle), s/2 + .2*s*Math.sin(knobAngle));
+				ctx.stroke();
+				
+				
+				ctx.beginPath();
+				ctx.globalCompositeOperation = "source-over";
+				ctx.lineCap = "round";
+				ctx.strokeStyle = "red";
+				ctx.lineWidth = 3;
+				ctx.arc(s/2, s/2, .45*s, start, end);
+				ctx.stroke();
+				
+				var angles=[0,1];
+				for(var i=shift; i<=steps; i++)
+					if (!angles.includes(i/steps))
+						angles.push(i/steps);
+				for(i of angles){
+					var val=getY(fct, p, isLog, i);
+					var angle = (i)*3*Math.PI/2+start;
+					var x=s/2 + .3*s*Math.cos(angle);
+					var y=s/2 + .3*s*Math.sin(angle);
+					
+					ctx.font = "17px serif";
+					ctx.textAlign="center"; 
+					
+					ctx.fillText(val.toFixed(2), x, y);
+				}
+				
+				var val=getY(fct, p, isLog, knob);
+				ctx.font = "20px serif";
+				ctx.textAlign="center"; 
+				
+				ctx.fillText(val.toFixed(2), s/2, s-25);
+			}
+		</script>
+	</head>
+	
+	<body onload="setListeners(); change();">
+		<div>
+		<div style="display: inline-block; vertical-align: top; width:30em;">
+			<p>
+				<input type="text" value="50e3" id="pot" name="pot"/>
+				<label for="pot">Value of the potentiometer</label>
+			</p>
+			<p>
+				<div>
+				<input type="text" value="y=5*x/p" id="fct" name="fct"/>
+				<label for="fct">Function, where 'y' is your final result; 'x' the current resistor value; and 'p' the potentiometer value</label>
+				</div>
+				<div>
+				<select id="prefill" onchange="prefill();">
+					<option value="" disabled selected hidden>Prefill</option>
+					<option value="div" selected>Divider</option>
+					<option value="idiv">Inverted divider</option>
+					<option value="LT1167">LT1167</option>
+				</select>
+				</div>
+			</p>
+			<p>
+				<div>
+				<input type="number" value="10" min="1" max="20" id="step" name="step"/>
+				<label for="step">Number of step</label>
+				</div>
+				<div>
+				<input type="number" value="0" min="0" max="100" id="shift" name="shift"/>
+				<label for="shift">Phase shift, in percent of step</label>
+				</div>
+				<div>
+				<input type="checkbox" id="log" name="log"/>
+				<label for="log">Use log</label>
+				</div>
+			</p>
+			<p>
+				<input type="button" value="Change" onclick="change();"/>
+			</p>
+		</div>
+		<div style="display: inline-block; vertical-align: top;">
+			<canvas id="out" width="250" height="250"></canvas>
+		</div>
+		</div>
+	</body>
+</html>
+				

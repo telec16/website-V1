@@ -1,0 +1,30 @@
+error {
+	color: crimson;
+	font-size: 50px;
+	text-align: center;
+	display: block;
+	padding-top: 40vh;
+}
+
+h1 {
+	text-align: center;
+	text-decoration: underline;
+	color: #FF8C00;
+}
+
+.title, h2 {
+	color: #714693;
+	font-size: 150%;
+}
+.subtitle, h3 {
+	color: #026395;
+	font-size: 120%;
+}
+.section, h4 {
+	color: #FF8C00;
+	font-size: 90%;
+}
+.subsection {
+	color: #FAEBD7;
+}
+

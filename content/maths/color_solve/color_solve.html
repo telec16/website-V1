@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Grapher</title>
+        <link rel='stylesheet' type='text/css' href='style.css'/>
+        <script type='text/javascript' src='grapher.js'></script>
+    </head>
+    <body onload="start();">
+		<div>
+		<p>This little app show (in color!) the solutions of a system of equations (when the system equals [0, 0]).</p>
+		<p>The first two frames are respectively the input and the output. We calculate each output coordinates (from [Xmin, Ymin] to [Xmax, Ymax]), to retrieve the corresponding color, and then we put this color onto the input.</p>
+		<p>This shows from which input we get a [0, 0] couple!</p>
+		<p>If you click the 'show' button, a graph corresponding to Z = f(x, y) will be drawn underneath, with Z in greyscale. This will also set the Z min and max, which is needed to draw correctly the first frame.</p>
+		<p>If you think that the black spot is not narrow enougth, you can play with the 'Saturation magnitude' (don't forget to update the output frame).</p>
+		<p>Here are some examples to get started : (As you can see, on the first example, circle, there seems to be two solutions, but that's because we are searching for any couple that produce [100, 0] (and that's [&plusmn;10, 0]). Pay attention to your axes !)</p>
+		<div>
+		<input type="button" value="Circle" onclick="examples(1);"/>
+		<input type="button" value="Phase shift" onclick="examples(2);"/>
+		<input type="button" value="Center shift" onclick="examples(3);"/>
+		</div>
+		</div>
+		<div>
+			<div>
+				<canvas id="input" width="500" height="500">
+					This text is displayed if your browser does not support HTML5 Canvas.
+				</canvas>
+				<canvas id="output" width="500" height="500">
+					This text is displayed if your browser does not support HTML5 Canvas.
+				</canvas>
+			</div>
+			<progress id="progress" value="0"></progress>
+			<div>
+				<label for="minX">X min:&nbsp;&nbsp;</label><input type="number" id="minX" name="minX" step="0.01"  value="-10"/>
+				<label for="maxX">X max:&nbsp;&nbsp;</label><input type="number" id="maxX" name="maxX" step="0.01"  value="10"/>
+				<label for="minY">Y min:&nbsp;&nbsp;</label><input type="number" id="minY" name="minY" step="0.01"  value="-10"/>
+				<label for="maxY">Y max:&nbsp;&nbsp;</label><input type="number" id="maxY" name="maxY" step="0.01"  value="10"/>
+			</div>
+			<div>
+				<label for="minX">Zx min:&nbsp;</label><input type="number" id="minZx" name="minZx" step="0.01"  value="-10"/>
+				<label for="minX">Zx max:&nbsp;</label><input type="number" id="maxZx" name="maxZx" step="0.01"  value="10"/>
+				<label for="minX">Zy min:&nbsp;</label><input type="number" id="minZy" name="minZy" step="0.01"  value="-10"/>
+				<label for="minX">Zy max:&nbsp;</label><input type="number" id="maxZy" name="maxZy" step="0.01"  value="10"/>
+			</div>
+			<label for="step">Step: </label><input type="number" id="step" name="step" min="1" step="1" value="5"/>
+			<label for="mag">Saturation magnitude: </label><input type="number" id="mag" name="mag" min="1" step="1" value="1"/>
+			<p>
+			<label for="X">X(x, y)=</label>
+			<input type="text" id="X" name="X" value="x"/>
+			<input type="button" value="show" onclick="drawFct('X');"/> </br>
+			<label for="Y">Y(x, y)=</label>
+			<input type="text" id="Y" name="Y" value="y"/>
+			<input type="button" value="show" onclick="drawFct('Y');"/>
+			</p>
+			<div>
+				<input type="button" value="update output" onclick="drawOut();"/>
+				<input type="button" value="draw graph !" onclick="drawGraph();"/>
+				<input type="button" value="STOP" onclick="stop();"/>
+				<input type="button" value="clear" onclick="clearAll();"/>
+			</div>
+			<div>
+				<canvas id="showX" width="500" height="500">
+					This text is displayed if your browser does not support HTML5 Canvas.
+				</canvas>
+				<canvas id="showY" width="500" height="500">
+					This text is displayed if your browser does not support HTML5 Canvas.
+				</canvas>
+			</div>
+		</div>
+		
+    </body>
+</html>

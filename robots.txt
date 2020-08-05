@@ -1,0 +1,4 @@
+User-agent : *
+Allow : /
+
+Sitemap : http://telec16.fr/sitemap.xml

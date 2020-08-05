@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>VGA to scope</title>
+		
+		<script type='text/javascript' src='sender.js'></script>
+		<script type='text/javascript' src='user_interface.js'></script>
+	</head>
+
+	<body onload="updateSettings();">
+		<table>
+			<tr>
+				<td>╲</td>
+				<th>X</th>
+				<th>Y</th>
+				<th>Z</th>
+			</tr>
+			<tr>
+				<th>R</th>
+				<td><input type="radio" name="red" value="x" onclick="updateSettings();" checked/></td>
+				<td><input type="radio" name="red" value="y" onclick="updateSettings();"/></td>
+				<td><input type="radio" name="red" value="z" onclick="updateSettings();"/></td>
+			</tr>
+			<tr>
+				<th>G</th>
+				<td><input type="radio" name="green" value="x" onclick="updateSettings();"/></td>
+				<td><input type="radio" name="green" value="y" onclick="updateSettings();" checked/></td>
+				<td><input type="radio" name="green" value="z" onclick="updateSettings();"/></td>
+			</tr>
+			<tr>
+				<th>B</th>
+				<td><input type="radio" name="blue" value="x" onclick="updateSettings();"/></td>
+				<td><input type="radio" name="blue" value="y" onclick="updateSettings();"/></td>
+				<td><input type="radio" name="blue" value="z" onclick="updateSettings();" checked/></td>
+			</tr>
+			<tr>
+				<th>I</th>
+				<td><input type="checkbox" id="invert_x" onclick="updateSettings();"/></td>
+				<td><input type="checkbox" id="invert_y" onclick="updateSettings();"/></td>
+				<td><input type="checkbox" id="invert_z" onclick="updateSettings();"/></td>
+			</tr>
+		</table>
+		
+		<div>
+			<input type="checkbox" id="gradient" onclick="updateSettings();"/>
+			<label for="gradient">Gradient</label>
+		</div>
+		
+		<div>
+			<input type="button" onclick="openOutput();" value="Open output"/>
+			<input type="button" onclick="preset();" value="Preset"/>
+		</div>
+		
+	</body>
+</html>

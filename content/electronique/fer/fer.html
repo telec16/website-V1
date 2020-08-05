@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<meta name="keywords" content="soldering iron, soldering station, pinout, connector, reference, weller, philips"/>
+		<meta name="description" content="List of soldering iron and station pinout, spec, connector, ..."/>
+
+
+		<title>Soldering iron pinout</title>
+		
+		<link rel='stylesheet' type='text/css' href='style.css'/>
+	</head>
+
+	<body>
+		<h2>Connectors</h2>
+		
+		<table class="connectors">
+		<thead>
+			<tr>
+				<th>Internal reference</th><th>Pin numbers</th><th>Photo</th><th>Dimensions</th><th>Type</th><th>Reference</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<th>DIN7-W-F</th>
+				<td><img src="DIN7-W-F.png"/></td>
+				<td><img src="WE1010_front.png"/><img src="WE1010_side.png"/></td>
+				<td>Outer diameter: 16.5mm</td>
+				<td rowspan="2">Bayonet</td>
+				<td rowspan="2">Probably <a href="http://www.amphenol-sine.com/pdf/catalog/C091.pdf">Amphenol C91B</a></td>
+			</tr>
+			<tr>
+				<th>DIN7-W-M</th>
+				<td><img src="DIN7-W-M.png"/></td>
+				<td><img src="WEP70.png"/><img src="WSP80.png"/></td>
+				<td>Outer diameter: 13.5mm</td>
+			</tr>
+			<tr>
+				<th>DIN5-P-F</th>
+				<td><img src="DIN5-P-F.png"/></td>
+				<td><img src="Philips.png"/></td>
+				<td>Outer diameter: 12.5mm</td>
+				<td rowspan="2">Screw</td>
+				<td rowspan="2"></td>
+			</tr>
+			<tr>
+				<th>DIN5-P-M</th>
+				<td><img src="DIN5-P-M.png"/></td>
+				<td><img src="SBC345_front.png"/><img src="SBC345_side.png"/></td>
+				<td>Outer diameter: 15.5mm</td>
+			</tr>
+		</tbody>
+		</table>
+		
+		<h2>Stations</h2>
+		
+		<table class="stations">
+		<thead>
+			<tr>
+				<th class="brand">Brand</th><th>Name</th><th>Output</th><th>Pinout</th><th>Connector</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<th rowspan="2" class="brand">Weller</th> <th>WE1010</th> <td><ul><li>23VAC</li><li>70W</li></ul></td>
+				<td><ol><li>?</li><li>Heater</li><li>Sensor</li><li>Sensor</li><li>Ground</li><li>Heater</li><li>?</li></ol></td>
+				<td rowspan="2">DIN7-W-F</td>
+			</tr>
+			<tr>
+				<th>PU81</th> <td><ul><li>24VAC</li><li>80W</li></ul></td>
+				<td><ol><li>Heater</li><li>Heater</li><li>Sensor</li><li>Sensor</li><li>Ground</li><li>?</li><li>?</li></ol></td>
+			</tr>
+			<tr>
+				<th class="brand">Philips</th> <th>SBC345</th> <td><ul><li>24VAC</li><li>60W</li></ul></td>
+				<td><ol><li>Sensor-</li><li>Sensor+</li><li>Heater+</li><li>Heater-</li><li>Ground</li></ol></td>
+				<td>DIN5-P-M</td>
+			</tr>
+		</tbody>
+		</table>
+		
+		<h2>Handles</h2>
+		
+		<table class="handles">
+		<thead>
+			<tr>
+				<th class="brand">Brand</th><th>Name</th><th>Heater spec</th><th>Sensor spec</th><th>Pinout</th><th>Connector</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<th rowspan="2" class="brand">Weller</th><th>WEP70</th> <td><ul><li>7ohms</li><li>23V</li><li>70W</li></ul></td> <td>Thermocouple type (?), 3ohms</td>
+				<td><ol><li>NP</li><li>Heater</li><li>Sensor</li><li>Sensor</li><li>Ground</li><li>Heater</li><li>NP</li></ol></td>
+				<td rowspan="2">DIN7-W-M</td>
+			</tr>
+			<tr>
+				<th>WSP80</th> <td><ul><li>7ohms</li><li>24V</li><li>80W</li></ul></td> <td>PTC, <a href="https://www.edaboard.com/threads/schematics-from-weller-pu81-power-unit-for-wsp80.90461/">R=19.96+0.113*T</a></td>
+				<td><ol><li>Heater</li><li>Heater</li><li>Sensor</li><li>Sensor</li><li>Ground</li><li>NC</li><li>NP</li></ol></td>
+			</tr>
+			<tr>
+				<th class="brand">Philips</th> <th>79-168003</th> <td><ul><li>?ohms</li><li>24V</li><li>60W</li></ul></td> <td>Thermocouple??</td>
+				<td><ol><li>Sensor-</li><li>Sensor+</li><li>Heater+</li><li>Heater-</li><li>Ground</li></ol></td>
+				<td>DIN5-P-F</td>
+			</tr>
+		</tbody>
+		</table>
+		
+		<p>
+		NC: Not connected; NP: Not populated
+		</p>
+		
+	</body>
+</html>

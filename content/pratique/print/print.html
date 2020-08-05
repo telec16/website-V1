@@ -1,0 +1,166 @@
+<html>
+	<head>
+    <meta charset="utf-8" />
+		
+		<title>Impression 3D</title>
+		
+		<link rel="stylesheet" href="/styleForm.css" />
+		<link rel="stylesheet" href="/styleADL.css" />
+		<script type='text/javascript' src='../utils.js'/>
+		
+		<script>
+		var type;
+		var diam;
+		var density;
+		var selector;
+		var variable;
+		
+		var weight_out;
+		var length_out;
+		
+		function start(){
+			type = document.getElementById("type_fil");
+			diam = document.getElementById("diam_fil");
+			density = document.getElementById("density");
+			price = document.getElementById("priceK");
+			selector = document.getElementById("selectInput");
+			variable = document.getElementById("input");
+			
+			weight_out = document.getElementById("weight");
+			length_out = document.getElementById("length");
+			price_out = document.getElementById("price");
+			
+			autoFill();
+		}
+		
+		function autoFill(){
+			var d;
+			var p;
+			
+			switch(type.value){
+				case "pla":
+					d = "1.27";
+					p = "19.80";
+				break;
+				case "abs":
+					d = "1.05";
+					p = "22.80";
+				break;
+				case "petg":
+					d = "1.25";
+					p = "30.00";
+				break;
+				default:
+					d = "1";
+					p = "20"
+				break;
+			}
+			density.value = d;
+			price.value = p;
+		}
+		
+		function onChange(bypass)
+		{
+			bypass = bypass || false;
+			if(document.getElementById("autoChange").checked || bypass){
+				var r = floatOf(diam)/2 *0.1;
+				var d = floatOf(density);
+				var p = floatOf(price);
+				
+				var X = floatOf(variable);
+				
+				switch(selector.value){
+					case "length":
+						l = X;
+						w = l*0.1 * Math.pow(Math.PI*r,2) * d /1000;
+					break;
+					case "weight":
+						w = X;
+						l = ((w*1000 / d) / (Math.pow(Math.PI*r,2))) *10;
+					break;
+				}
+				
+				p *= w;
+				
+				var accuracy = parseInt(document.getElementById("prec").value);
+				
+				setFloat(weight_out, w, accuracy);
+				setFloat(length_out, l, accuracy);
+				setFloat(price_out, p, accuracy);
+			}
+		}
+		</script>
+		
+	</head>
+	
+	<body onload="start()">
+	
+		<div class="form-vertical">
+			<div class="form-block">
+				<span class="title">Dimensions de base</span>
+				<div>
+					<div class="form-vertical">
+						<div class="subtitle">Type de fil</div>
+						<select id="type_fil" onchange="autoFill();onChange();">
+						   <option value="pla" selected>PLA</option>
+						   <option value="abs">ABS</option>
+						   <option value="petg">PETG</option>
+						</select>
+					</div>
+					<div class="form-vertical">
+						<div class="subtitle">Diamètre du fil</div>
+						<select id="diam_fil" onchange="onChange();">
+						   <option value="1.75" selected>1.75mm</option>
+						   <option value="3">3mm</option>
+						</select>
+					</div>
+					<div class="form-vertical">
+						<div class="subtitle">Masse volumique (g/cm^3)</div>
+						<input type="text" id="density" onkeyup="onChange();"/>
+					</div>
+					<div class="form-vertical">
+						<div class="subtitle">Prix au kilo</div>
+						<input type="text" id="priceK" onkeyup="onChange();"/>
+					</div>
+				</div>
+			</div>
+			
+			<div class="form-block">
+				<span class="title">Calculs</span>
+				<div>
+					<select id="selectInput" onchange="onChange();">
+						   <option value="length" selected>Longueur de fil (mm)</option>
+						   <option value="weight">Poids (kg)</option>
+					</select>
+					<input type="text" id="input" onkeyup="onChange();"/>
+				</div>
+			</div>
+			
+			<div class="form-block">
+				<span class="title">Résultats</span>
+				<div>
+					<div class="form-vertical">
+					Poids (kg)</br>
+					Longueur de fil (mm)</br>
+					Prix</br>
+					</div>
+					<div class="form-vertical">
+					 : <span id="weight"></span></br>
+					 : <span id="length"></span></br>
+					 : <span id="price"></span></br>
+					</div>
+				</div>
+			</div>
+			
+			
+			<div class="form-block">
+				<span class="title">Paramètres</span>
+				<div class="subtitle">Actualisation automatique</div>
+				<input type="checkbox" id="autoChange" checked>On</input>
+				<input type="button" onclick = "onChange(true);" value="Actualiser"></input>
+				<div class="subtitle">Précision</div>
+				<input type="range" min="0" max="10" value="3" id="prec" oninput="onChange(true);"/>
+			</div>
+		</div>
+	</body>
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		
+		<title>Resistor chooser</title>
+		
+		<link rel="stylesheet" href="/styleADL.css" />
+		<script type='text/javascript' src='../utils.js'></script>
+		<script type='text/javascript'>
+			handler=null;
+			function timer(){
+				clearTimeout(handler);
+				handler = setTimeout(change, 500);
+			}			
+			
+			function change(){
+				s = floatOf(document.getElementById("serie"), 12);
+				t = document.getElementById("type").value;
+				r = floatOf(document.getElementById("ratio"), 1);
+				R1 = document.getElementById("R1");
+				R2 = document.getElementById("R2");
+				Real = document.getElementById("Real");
+				Error = document.getElementById("Error");
+				
+				serie = getResistorSerie(s);
+				
+				if(t == "div") r = (1-r)/r;
+				
+				if(r<=0) return;
+				
+				mult=1;
+				minError = Infinity;
+				tries = 0;
+				descend = false;
+				do{
+					for(i=0; i<s; i++){
+					for(j=0; j<s; j++){
+						ratio = mult*serie[i]/serie[j];
+						e = (ratio-r)/r;
+						if(Math.abs(e) < Math.abs(minError)){
+							minError = e;
+							setFloat(R1, mult*serie[i], Math.max(-Math.log(mult),0)); 
+							setFloat(R2, serie[j], 0);
+							if(t == "div") ratio = 1/(ratio+1);
+							setFloat(Real, ratio, 3); 
+							setFloat(Error, minError*100, 2); 
+						}
+						
+					}
+					}
+					
+					if(Math.abs(minError)<.3) {tries++;}
+					else tries = 0
+					
+					if(tries==0)
+						descend = minError>0;
+						
+					if(descend)
+						mult/=10;
+					else
+						mult*=10;
+				}while(tries<2);
+			}
+			
+		</script>
+	</head>
+	
+	<body onload="change();">
+		<p>
+			<select id="serie" onchange="change();">
+				<option value="6">E6</option>
+				<option value="12" selected>E12</option>
+				<option value="24">E24</option>
+				<option value="48">E48</option>
+				<option value="96">E96</option>
+				<option value="192">E192</option>
+			</select>
+			<select id="type" onchange="change();">
+				<option value="ratio" selected>Ratio R1/R2</option>
+				<option value="div">Divider R2/(R1+R2)</option>
+			</select>
+			<input type="text" id="ratio" name="ratio" onkeyup="timer();"/>
+		</p>
+		<p>
+			R1 is <label id="R1"></label> ohm, R2 is <label id="R2"></label> ohm.
+		</p>
+		<p>
+			Exact value is <label id="Real"></label>, with an error of <label id="Error"></label>%.
+		</p>
+	</body>
+</html>
+				

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		
+		<title>Resistor chooser</title>
+		
+		<style>
+			input[type=text] { width:3em; }
+			table { border-collapse: collapse; }
+			tr { height:32px; border: double;}
+			td:first-child { padding-left:10px; text-align:right;}
+		</style>
+		
+		<link rel="stylesheet" href="/styleADL.css" />
+		<script type='text/javascript' src='../utils.js'></script>
+		<script type='text/javascript'>
+		
+			function change(type){
+				Vp_div = document.getElementById("Vp");
+				R1_div = document.getElementById("R1");
+				Va_div = document.getElementById("Va");
+				P_div  = document.getElementById("P");
+				Vb_div = document.getElementById("Vb");
+				R2_div = document.getElementById("R2");
+				Vm_div = document.getElementById("Vm");
+				s_div  = document.getElementById("serie");
+				
+				Vp = floatOf(Vp_div, 15);
+				P = floatOf(P_div, 10);
+				Vm = floatOf(Vm_div, -15);
+				
+				if(type == "res"){
+					Va = floatOf(Va_div, 5);
+					Vb = floatOf(Vb_div, -5);
+					
+					R1 = P*(Vp-Va)/(Va-Vb);
+					R2 = P*(Vb-Vm)/(Va-Vb);
+				}else if(type == "volt"){
+					R1 = floatOf(R1_div, 10);
+					R2 = floatOf(R2_div, 10);
+					
+					Va = (Vp-Vm) * (P+R2)/(R1+P+R2) + Vm;
+					Vb = (Vp-Vm) * (  R2)/(R1+P+R2) + Vm;
+				}else if(type == "serie"){
+					R1 = floatOf(R1_div, 10);
+					R2 = floatOf(R2_div, 10);
+					s = floatOf(s_div, 12);
+					serie = getResistorSerie(s);
+					
+					R1 = closestInList(serie, R1);
+					R2 = closestInList(serie, R2);
+					
+					Va = (Vp-Vm) * (P+R2)/(R1+P+R2) + Vm;
+					Vb = (Vp-Vm) * (  R2)/(R1+P+R2) + Vm;
+				}
+				
+				var acc = 2;
+				setValue(Vp_div, Vp, acc);
+				setValue(R1_div, R1, acc);
+				setValue(Va_div, Va, acc);
+				setValue(P_div , P , acc);
+				setValue(Vb_div, Vb, acc);
+				setValue(R2_div, R2, acc);
+				setValue(Vm_div, Vm, acc);
+			}
+		</script>
+	</head>
+	
+	<body onload="change('res');">
+		<div>
+			<div style="display:inline-block;">
+			<img src="res_div.png" width="40" height="227" alt="Double resistor divider"/>
+			</div>
+			<div style="display:inline-block;">
+			<table>
+				<tr><td><input type="button" onclick="change('volt');" value="Get Va&b"/></td>	<td><input type="button" onclick="change('res');" value="Get R1&2"/></td></tr>
+				<tr style="background-color: #f04242;">							<td><input type="text" id="Vp"/></td>	<td>V+</td></tr>
+				<tr style="background-color: #f09942;"><td>R1</td>	<td><input type="text" id="R1"/></td>						 </tr>
+				<tr style="background-color: #f0f042;">							<td><input type="text" id="Va"/></td>	<td>Va</td></tr>
+				<tr style="background-color: #c4f042;"><td>P </td>	<td><input type="text" id="P" /></td>						 </tr>
+				<tr style="background-color: #42f042;">							<td><input type="text" id="Vb"/></td>	<td>Vb</td></tr>
+				<tr style="background-color: #42f099;"><td>R2</td>	<td><input type="text" id="R2"/></td>						 </tr>
+				<tr style="background-color: #42c4f0;">							<td><input type="text" id="Vm"/></td>	<td>V-</td></tr>
+			</table>
+			</div>
+		</div>
+		<div>
+		Get closest <select id="serie" onchange="change('serie');">
+				<option value="6">E6</option>
+				<option value="12" selected>E12</option>
+				<option value="24">E24</option>
+				<option value="48">E48</option>
+				<option value="96">E96</option>
+				<option value="192">E192</option>
+			</select> serie <input type="button" value="update" onclick="change('serie');" />
+		</div>
+	</body>
+</html>
+				

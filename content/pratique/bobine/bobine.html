@@ -1,0 +1,220 @@
+<html>
+	<head>
+        <meta charset="utf-8" />
+		
+		<title>Coil calculation</title>
+		
+		<link rel="stylesheet" href="/styleForm.css" />
+		<link rel="stylesheet" href="/styleADL.css" />
+		<script type='text/javascript' src='../utils.js'/>
+		
+		<script>
+		var wire;
+		var interior;
+		var exterior;
+		var selector;
+		var variable;
+		var permeability;
+		var current;
+		var distance;
+		var area;
+		
+		var layers_out;
+		var length_out;
+		var turn_out;
+		var depth_out;
+		var L_out;
+		var NI_out;
+		var B_out;
+		var F_out;
+		
+		
+		function start(){
+			wire = document.getElementById("diam_fil");
+			interior = document.getElementById("diam_int");
+			exterior = document.getElementById("diam_ext");
+			selector = document.getElementById("selectInput");
+			variable = document.getElementById("input");
+			permeability = document.getElementById("perm_rel");
+			current = document.getElementById("current");
+			distance = document.getElementById("dist");
+			area = document.getElementById("area");
+			
+			layers_out = document.getElementById("layers_O");
+			length_out = document.getElementById("Ltot_O");
+			turn_out = document.getElementById("Ntot_O");
+			depth_out = document.getElementById("lCoil_O");
+			L_out = document.getElementById("L_O");
+			NI_out = document.getElementById("NI_O");
+			B_out = document.getElementById("B_O");
+			F_out = document.getElementById("F_O");
+		}
+		
+		function onChange(bypass)
+		{
+			bypass = bypass || false;
+			if(document.getElementById("autoChange").checked || bypass){
+				//First results
+				var d = floatOf(wire);
+				var Ri = floatOf(interior)/2;
+				var Re = floatOf(exterior)/2;
+				
+				var X = floatOf(variable);
+				
+				var N = Math.min((Re-Ri)/d);
+				var Le = 2*Math.PI*(d*N*(N+1)/2+N*Ri);
+				
+				var Ltot=0;
+				var Ntot=0;
+				var lCoil=0;
+				
+				switch(selector.value){
+					case "Ltot":
+						Ltot  = X;
+						Ntot  = N*Ltot/Le;
+						lCoil = d*Ltot/Le;
+					break;
+					case "Ntot":
+						Ntot  = X;
+						Ltot  = Le*Ntot/N;
+						lCoil = d*Ntot/N;
+					break;
+					case "lCoil":
+						lCoil = X;
+						Ltot  = Le*lCoil/d;
+						Ntot  = N*lCoil/d;
+					break;
+				}
+				
+				//Second results
+				var permO = 4*Math.PI*Math.pow(10,-7);
+				var permR = floatOf(permeability);
+				var perm  = permO*permR;
+				var I = floatOf(current);
+				var l = floatOf(distance);
+				var S = floatOf(area);
+				
+				var L = perm*(Ntot*Ntot)*(Math.PI*Ri*Ri)/lCoil;
+				var NI = Ntot*I;
+				var B = perm*NI/l;
+				var F = S*B*B/(2*perm);
+				
+				var accuracy = parseInt(document.getElementById("prec").value);
+				
+				setFloat(layers_out, N    , accuracy);
+				setFloat(length_out, Ltot , accuracy);
+				setFloat(turn_out  , Ntot , accuracy);
+				setFloat(depth_out , lCoil, accuracy);
+				setFloat(L_O , L , accuracy);
+				setFloat(NI_O, NI, accuracy);
+				setFloat(B_O , B , accuracy);
+				setFloat(F_O , F , accuracy);
+			}
+		}
+		</script>
+		
+	</head>
+	
+	<body onload="start()">
+	
+		<div class="form-vertical">
+			<div class="form-block">
+				<span class="title">Dimensions de base</span>
+				<div>
+					<div class="form-vertical">
+						<div class="subtitle">Diamètre du fil</div>
+						<input type="text" id="diam_fil" onkeyup="onChange();"/>
+					</div>
+					<div class="form-vertical">
+						<div class="subtitle">Diamètre interieur</div>
+						<input type="text" id="diam_int" onkeyup="onChange();"/>
+					</div>
+					<div class="form-vertical">
+						<div class="subtitle">Diamètre exterieur</div>
+						<input type="text" id="diam_ext" onkeyup="onChange();"/>
+					</div>
+				</div>
+			</div>
+			
+			<div class="form-block">
+				<span class="title">Calculs</span>
+				<div>
+					<select id="selectInput" onchange="onChange();">
+						   <option value="Ltot">Longueur totale du fil</option>
+						   <option value="Ntot">Nombre de tours</option>
+						   <option value="lCoil">Longueur de la bobine</option>
+					</select>
+					<input type="text" id="input" onkeyup="onChange();"/>
+				</div>
+			</div>
+			
+			<div class="form-block">
+				<span class="title">Résultats</span>
+				<div>
+					<div class="form-vertical">
+					Couches</br>
+					Longueur totale du fil</br>
+					Nombre de tours</br>
+					Longueur de la bobine</br>
+					</div>
+					<div class="form-vertical">
+					 : <span id="layers_O"></span></br>
+					 : <span id="Ltot_O"></span></br>
+					 : <span id="Ntot_O"></span></br>
+					 : <span id="lCoil_O"></span></br>
+					</div>
+				</div>
+			</div>
+			
+			<div class="form-block">
+				<span class="title">Inductance</span>
+				<div>
+					<div class="form-vertical">
+						<div class="subtitle">Permeabilté relative</div>
+						<input type="text" id="perm_rel" onkeyup="onChange();"/>
+					</div>
+					<div class="form-vertical">
+						<div class="subtitle">Courant</div>
+						<input type="text" id="current" onkeyup="onChange();"/>
+					</div>
+					</br>
+					<div class="form-vertical">
+						<div class="subtitle">Distance de l'objet</div>
+						<input type="text" id="dist" onkeyup="onChange();"/>
+					</div>
+					<div class="form-vertical">
+						<div class="subtitle">Surface de l'objet</div>
+						<input type="text" id="area" onkeyup="onChange();"/>
+					</div>
+				</div>
+			</div>
+			
+			<div class="form-block">
+				<span class="title">Résultats</span>
+				<div>
+					<div class="form-vertical">
+					Inductance</br>
+					Ampères-tours</br>
+					Induction magnétique</br>
+					Force</br>
+					</div>
+					<div class="form-vertical">
+					 : <span id="L_O"></span></br>
+					 : <span id="NI_O"></span></br>
+					 : <span id="B_O"></span></br>
+					 : <span id="F_O"></span></br>
+					</div>
+				</div>
+			</div>
+			
+			<div class="form-block">
+				<span class="title">Paramètres</span>
+				<div class="subtitle">Actualisation automatique</div>
+				<input type="checkbox" id="autoChange" checked>On</input>
+				<input type="button" onclick = "onChange(true);" value="Actualiser"></input>
+				<div class="subtitle">Précision</div>
+				<input type="range" min="0" max="10" value="3" id="prec" oninput="onChange(true);"/>
+			</div>
+		</div>
+	</body>
+</html>

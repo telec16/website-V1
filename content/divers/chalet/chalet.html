@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Snow Flakes !</title>
+        <link rel='stylesheet' type='text/css' href='style.css'/>
+    </head>
+    <body>
+        <canvas id="a" width="500" height="300">
+            This text is displayed if your browser does not support HTML5 Canvas.
+        </canvas>
+		<div>
+			<!--<input type="button" value="clear" onclick="flushFlakes();"/>-->
+			<input type="button" value="stop" onclick="StopTheseFuckingFlakes();"/>
+		</div>
+		<div>
+			<input type="color" id="color" value="#00b9b9"/>
+			<input type="button" value="add flake !" onclick="addOneFlake();"/>
+			<input type="button" value="add The Random One !" onclick="addTheRandomOneFlake();"/>
+			<input type="button" value="add The Only One !" onclick="addTheOnlyOneFlake();"/>
+		</div>
+        <script type='text/javascript' src='anim_sf.js'></script>
+    </body>
+</html>

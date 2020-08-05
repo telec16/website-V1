@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Projection sph&eacute;rique</title>
+	</head>
+    <body>
+		<p>En me promenant sur internet, j&rsquo;ai d&eacute;couvert un outil sympa&nbsp;:
+		la projection st&eacute;r&eacute;ographique&nbsp;! Le principe est simple&nbsp;: projeter un
+		plan sur un volume.</p>
+
+		<p>Donc, une fois le plan projet&eacute;, il peut &laquo;&nbsp;creuser&nbsp;&raquo;
+		des trous dans volume, et si on vient placer une lumi&egrave;re au point de
+		projection, on va recr&eacute;er ce plan&nbsp;!</p>
+
+		<p>Tout ceci me paraissait vachement amusant, j&rsquo;ai donc d&eacute;cid&eacute;
+		de faire un petit programme avec <a href="http://www.openscad.org/">OpenSCAD</a>, un logiciel de mod&eacute;lisation 3D &laquo;&nbsp;textuel&nbsp;&raquo;.
+		Et voil&agrave; le r&eacute;sultat&nbsp;:</p>
+
+		<div><img width="451" height="394" src="model_heart.png"/>
+		<img width="448" height="392" src="model_square.png"/></div>
+
+		<p>Pour obtenir &ccedil;a, il faut commencer par faire l&rsquo;image. Celle-ci
+		doit &ecirc;tre en .dxf (vectorielle), on pourra utiliser <a href="https://inkscape.org/">Inkscape</a>, par exemple.</p>
+
+		<p>Une fois l&rsquo;image faite, il suffit de l&rsquo;importer en dessous
+		de cette ligne&nbsp;: <code>stereo(sphere_r, inter, inv_diff, diff)</code>, qui prends comme arguments&nbsp;:</p>
+
+		<ul><li><code>sphere_r</code>&nbsp;: Rayon de la sph&egrave;re</li>
+
+		<li><code>inter</code>&nbsp;: faire une intersection entre la projection et la sph&egrave;re (utile quand les couleurs sont invers&eacute;e, comme square.dxf)</li>
+
+		<li><code>inv_diff</code>&nbsp;: rajoute le &laquo;&nbsp;chapeau&nbsp;&raquo; de la sph&egrave;re (utile quand les couleurs sont invers&eacute;e, comme square.dxf)</li>
+
+		<li><code>diff</code>&nbsp;: option de base pour faire la projection</li></ul>
+
+		<p>Il faut ensuite faire le rendu (<kbd>F7</kbd>) et exporter en .stl, pour pouvoir l&rsquo;imprimer.</p>
+
+		<p>Le r&eacute;sultat est au rendez-vous&nbsp;:</p>
+
+		<div><img width="333" height="326" src="print.png"></div>
+
+		<p>M&ecirc;me avec une impression d&rsquo;assez faible qualit&eacute;, l&rsquo;image ressort tr&egrave;s bien&nbsp;!</p>
+
+		<div><img width="667" height="667" src="light.png"></div>
+
+		<p>Le placement de la LED est cependant primordial&nbsp;! Un simple &eacute;cart du point de projection et l&rsquo;image s&rsquo;en va&hellip; Il est tr&egrave;s difficile de la coller aussi, mais avec un peu de patience on finit par y arriver.</p>
+    </body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>Auto sound</title>
+		<link rel="stylesheet" href="style.css">
+		
+		<script type='text/javascript' src='Tone.js'></script>
+		<script type='text/javascript' src='synth.js'></script>
+		<script type='text/javascript' src='tempo.js'></script>
+		<script type='text/javascript' src='notes.js'></script>
+		<script type='text/javascript' src='matrix.js'></script>
+		<script type='text/javascript' src='sound.js'></script>
+	</head>
+		
+	<body onload="init();">
+	<div>
+	<H1>Generative music</H1>
+		<p>Create randomly generated music with markov chains!</p>
+		<ol>
+		<li>Choose the sound (WIP)</li>
+		<li>Choose the tempo, the note duration, and the after-note blank duration</li>
+		<li>Add notes (A-G, optional #/b, and +/- to change octave)</li>
+		<li>Change the probabilities in the matrix</li>
+		<li>Enjoy!</li>
+		<ol>
+	</div>
+	<div>
+	<H2>Synth</H2>
+	TODO~
+	</div>
+	<div>
+	<H2>Tempo</H2>
+		<table class="tempo">
+		<tr><th>Note+Blank</th><td><input type="range" id="tot_dur" min="1" max="16" value="4"/></td><th>BPM</th><td><input type="number" id="bpm" min="60" max="240" step="10" value="120"/></td></tr>
+		<tr><th>Note</th><td><input type="range" id="note_dur" min="1" max="16" value="8"/></td><td colspan=2><input type="button" onclick="toggle(this);" value="Start"/></td></tr>
+		</table>
+	</div>
+	<div>
+	<H2>Notes</H2>
+		<table id="notes"></table>
+		<input type="button" onclick="delNote();" value="-"/>
+		<input type="button" onclick="addNote();" value="+"/>
+		<input type="number" id="octave" min="1" max="6" value="3"/>
+	</div>
+	<div>
+	<H2>Matrix</H2>
+		<table id="matrix"></table>
+	</div>
+	<div>
+	<H2>Debug</H2>
+		<table class="debug">
+		<tr><th>i</th><td id='tick'>0</td></tr>
+		<tr><th>AudioContext time</th><td id='time'>0</td></tr>
+		<tr><th>current note</th><td id='note'></td></tr>
+		<tr><th>next note</th><td id='next'></td></tr>
+		</table>
+	</div>
+	</body>
+</html>

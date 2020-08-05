@@ -1,0 +1,21 @@
+body {
+	font-family: monospace;
+}
+
+canvas {
+    border: solid 2px #666666;
+    background-color:#112233;
+	width:75vh;
+	height:75vh;
+	max-width:45vw;
+	max-height:45vw;
+}
+
+progress {
+	width:75vh;
+	max-width:40vw;
+}
+
+input[type="number"]{
+	width:5em;
+}

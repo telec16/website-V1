@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>Draw sound</title>
+		
+		<script type='text/javascript' src='sound.js'></script>
+		<script type='text/javascript' src='drawer.js'></script>
+		<script type='text/javascript' src='synth.js'></script>
+		<script type='text/javascript' src='user_interface.js'></script>
+	</head>
+
+	<body onload="initCanvas('wave', 'output'); setPreset('preset'); initSynth();">
+		<table style="width: 512px;">
+			<tr>
+				<th>Volume</th>
+				<th>Frequency</th>
+				<th>Preset</th>
+			</tr>
+			<tr>
+				<td><input type="range" onchange="refreshVolume(this);" min="-40" max="0" value="-6"/></td>
+				<td><input type="range" onchange="refreshFrequency(this);" min="100" max="1000" value="440"/></td>
+				<td><select id="preset" onchange="loadPreset(this)"></select></td>
+			</tr>
+		</table>
+		
+		<div>
+			<div>
+				<input type="range" onchange="refreshSize(this);" min="16" max="512" value="512" style="width: 496px; margin-left: 16px;"/>
+			</div>
+			<div>
+				<canvas id="wave" width='512' height='150'>
+			</div>
+			<div>
+				<canvas id="output" width='512' height='150' style="width: 512px; height: 150px;">
+			</div>
+		</div>
+		
+	</body>
+</html>

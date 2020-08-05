@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		
+		<title>OpAmp gain</title>
+		
+		<style>
+			input[type=text] { width:3em; }
+			table { border-collapse: collapse; }
+			tr { height:32px; border: none;}
+			td{ text-align:center;}
+		</style>
+		
+		<link rel="stylesheet" href="/styleADL.css" />
+		<script type='text/javascript' src='../utils.js'></script>
+		<script type='text/javascript'>
+			handler=null;
+			function timer(type){
+				clearTimeout(handler);
+				handler = setTimeout(change, 500, type);
+			}
+			
+			function change(type){
+				G0_div = document.getElementById("G0");
+				G1_div = document.getElementById("G1");
+				P_div  = document.getElementById("P");
+				R1_div = document.getElementById("R1");
+				R2_div = document.getElementById("R2");
+				s_div  = document.getElementById("serie");
+				G_div  = document.getElementById("G");
+				
+				ctx = document.getElementById("cnv").getContext("2d");
+				
+				//Change picture
+				topo   = document.getElementById("topology").value;
+				document.getElementById("circuit").src = topo+".png";
+				
+				//Get fields values
+				G0 = Math.abs(floatOf(G0_div, .5));
+				G1 = Math.abs(floatOf(G1_div, 5));
+				P = floatOf(P_div, 10);
+				R1 = floatOf(R1_div, 10);
+				R2 = floatOf(R2_div, 10);
+				
+				//Sanitize gains
+				A = Math.max(G0, G1);
+				a = Math.min(G0, G1);
+				if(topo.indexOf("NI") != -1){
+					A = Math.max(A, 1);
+					a = Math.max(a, 1);
+				}
+				
+				//Compute resistances
+				if(type == "res"){
+					switch(topo){
+						case "Ilr":
+							R1 = P *   (a+1)/(A-a);
+							R2 = P * a*(A+1)/(A-a);
+							G_div.innerHTML = "(R2+x)/(R1+p-x)";
+						break;
+						case "Il":
+							R1 = P *   a/(A-a);
+							R2 = P * A*a/(A-a);
+							G_div.innerHTML = "R2/(R1+x)";
+						break;
+						case "Ir":
+							R1 = P * 1/(A-a);
+							R2 = P * a/(A-a);
+							G_div.innerHTML = "(R2+x)/R1";
+						break;
+						case "NIlr":
+							R1 = P *     a  /(A-a);
+							R2 = P * A*(a-1)/(A-a);
+							G_div.innerHTML = "1+(R2+x)/(R1+p-x)";
+						break;
+						case "NIl":
+							//Gain can't be 1
+							if(A==1){A=2;}
+							if(a==1){a=1.1;}
+							R1 = P *       (a-1)/(A-a);
+							R2 = P * (A-1)*(a-1)/(A-a);
+							G_div.innerHTML = "1+R2/(R1+x)";
+						break;
+						case "NIr":
+							R1 = P *   1  /(A-a);
+							R2 = P * (a-1)/(A-a);
+							G_div.innerHTML = "1+(R2+x)/R1";
+						break;
+					}
+				}
+				
+				//Get closest resistance serie
+				if(type == "serie"){
+					s = floatOf(s_div, 12);
+					serie = getResistorSerie(s);
+					
+					R1 = closestInList(serie, R1);
+					R2 = closestInList(serie, R2);					
+					
+				}
+				
+				//Compute gains
+				switch(topo){
+					case "Ilr":
+						G0 = R2/(R1+P);
+						G1 = (R2+P)/R1;
+					break;
+					case "Il":
+						G0 = R2/(R1+P);
+						G1 = R2/R1;
+					break;
+					case "Ir":
+						G0 = R2/R1;
+						G1 = (R2+P)/R1;
+					break;
+					case "NIlr":
+						G0 = 1 + R2/(R1+P);
+						G1 = 1 + (R2+P)/R1;
+					break;
+					case "NIl":
+						G0 = 1 + R2/(R1+P);
+						G1 = 1 + R2/R1;
+					break;
+					case "NIr":
+						G0 = 1 + R2/R1;
+						G1 = 1 + (R2+P)/R1;
+					break;
+				}
+				
+				//Create function
+				switch(topo){
+					case "Ilr":
+						fct = function(alpha) { return (R2+alpha*P)/(R1+P*(1-alpha));}
+					break;
+					case "Il":
+						fct = function(alpha) { return R2/(R1+alpha*P);}
+					break;
+					case "Ir":
+						fct = function(alpha) { return (R2+alpha*P)/R1;}
+					break;
+					case "NIlr":
+						fct = function(alpha) { return 1+(R2+alpha*P)/(R1+P*(1-alpha));}
+					break;
+					case "NIl":
+						fct = function(alpha) { return 1+R2/(R1+alpha*P);}
+					break;
+					case "NIr":
+						fct = function(alpha) { return 1+(R2+alpha*P)/R1;}
+					break;
+				}
+				
+				//Set fields (1/Infinity => NaN => 0)
+				var acc = 2;
+				setValue(G0_div, G0||0, acc);
+				setValue(G1_div, G1||0, acc);
+				setValue(P_div , P ||0, acc);
+				setValue(R1_div, R1||0, acc);
+				setValue(R2_div, R2||0, acc);
+				
+				drawFct(ctx, fct, 300, 200);
+			}
+			
+		function drawFct(ctx, fct, xSize, ySize){
+			var alpha, gain;
+			var Ca,Cg;
+			var max, min;
+			
+			//Auto-set range
+			for(Ca=0; Ca<xSize; Ca++){
+				alpha = map(Ca, 0, xSize-1, 0, 1);
+				gain = fct(alpha);
+				
+				//Setup min and max
+				if(Ca==0){
+					max=gain;
+					min=gain;
+				}
+				else{
+					max = Math.max(max, gain);
+					min = Math.min(min, gain);
+				}
+			}
+			
+			//Actual drawing
+			ctx.fillStyle = "white";
+			ctx.fillRect(0, 0, xSize, ySize);
+			ctx.fillStyle = "black";
+			for(Ca=0; Ca<xSize; Ca++){
+				alpha = map(Ca, 0, xSize-1, 0, 1);
+				gain = fct(alpha);
+				Cg = map(gain, min, max, 0, ySize-1);
+				ctx.fillRect(Ca, ySize-Cg-1, 1, -1);
+			}
+		}
+			
+		</script>
+	</head>
+	
+	<body onload="change('res');">
+		<div>
+			<div style="display:inline-block;">
+			<table>
+				<tr><td colspan="3">
+				<select id="topology" onchange="change('res');">
+					<option value="Ilr">Inverter, pot on both sides</option>
+					<option value="Il">Inverter, pot on left side</option>
+					<option value="Ir">Inverter, pot on right side</option>
+					<option value="NIlr">Non-Inverter, pot on both sides</option>
+					<option value="NIl">Non-Inverter, pot on left side</option>
+					<option value="NIr">Non-Inverter, pot on right side</option>
+				</select>
+				</td></tr>
+				<tr><td>G min</td><td>G</td><td>G max</td></tr>
+				<tr><td><input type="text" id="G0" onkeyup="timer('res');"/></td><td id="G"></td><td><input type="text" id="G1" onkeyup="timer('res');"/></td></tr>
+				<tr><td>R1</td><td>P</td><td>R2</td></tr>
+				<tr><td><input type="text" id="R1" onkeyup="timer('gain');"/></td><td><input type="text" id="P" onkeyup="timer('res');"/></td><td><input type="text" id="R2" onkeyup="timer('gain');"/></td></tr>
+				<tr><td colspan="3">
+					Get closest <select id="serie" onchange="change('serie');">
+						<option value="6">E6</option>
+						<option value="12" selected>E12</option>
+						<option value="24">E24</option>
+						<option value="48">E48</option>
+						<option value="96">E96</option>
+						<option value="192">E192</option>
+					</select> serie <input type="button" value="update" onclick="change('serie');" />
+				</td></tr>
+			</table>
+			</div><div style="display:inline-block;">
+			<img src="Ilr.png" id="circuit" width="400" height="200" alt="OpAmp circuit"/>
+			</div><div style="display:inline-block;">
+			<canvas id="cnv" width="300" height="200" alt="Gain vs alpha"/>
+			</div>
+		</div>
+	</body>
+</html>
+				

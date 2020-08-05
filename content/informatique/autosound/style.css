@@ -1,0 +1,20 @@
+input[type="number"] {
+	width: 3em;
+}
+input[type="text"] {
+	width: 2em;
+}
+
+table.debug th{
+	text-align: right;
+}
+table.debug td{
+	text-align: left;
+}
+table.tempo {
+	text-align: center;
+}
+table#matrix input[type="number"] {
+	width: 3em;
+	height: 3em;
+}

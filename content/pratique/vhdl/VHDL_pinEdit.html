@@ -1,0 +1,108 @@
+<html>
+	<head>
+        <meta charset="utf-8" />
+		
+		<title>Easily make your VHDL files</title>
+		
+		<link rel="stylesheet" href="/styleForm.css" />
+		<link rel="stylesheet" href="/styleADL.css" />
+		
+		<script src="../utils.js" type="text/javascript"></script>
+		<script src="filezator.js" type="text/javascript"></script>
+		
+	</head>
+	
+	<body>
+	
+		<div style="display:inline-block; vertical-align:top;">
+			<!-- Options -->
+			<div class="form-block">
+				<span class="title">Nom</span></br>
+				<input type="text" id="name" onkeydown="onChange();"/>
+			</div>
+			<div class="form-block">
+				<span class="title">Composant</span></br>
+				<select id="device">
+					   <option value="EPF10K20RC240-3">EPF10K20RC240</option>
+				</select>
+			</div>
+			
+			<div class="form-block" id="bar">
+				<span class="title">Bargraph</span></br>
+				Led0 : <input type="text" name="0" size="32" onkeydown="onChange();"/></br>
+				Led1 : <input type="text" name="1" size="32" onkeydown="onChange();"/></br>
+				Led2 : <input type="text" name="2" size="32" onkeydown="onChange();"/></br>
+				Led3 : <input type="text" name="3" size="32" onkeydown="onChange();"/></br>
+				Led4 : <input type="text" name="4" size="32" onkeydown="onChange();"/></br>
+				Led5 : <input type="text" name="5" size="32" onkeydown="onChange();"/></br>
+				Led6 : <input type="text" name="6" size="32" onkeydown="onChange();"/></br>
+				Led7 : <input type="text" name="7" size="32" onkeydown="onChange();"/></br>
+			</div>
+			<div class="form-block" id="seg1">
+				<span class="title">Afficheur 7 segments 1</span></br>
+				SEG1a : <input type="text" name="0" size="32" onkeydown="onChange();"/></br>
+				SEG1b : <input type="text" name="1" size="32" onkeydown="onChange();"/></br>
+				SEG1c : <input type="text" name="2" size="32" onkeydown="onChange();"/></br>
+				SEG1d : <input type="text" name="3" size="32" onkeydown="onChange();"/></br>
+				SEG1e : <input type="text" name="4" size="32" onkeydown="onChange();"/></br>
+				SEG1f : <input type="text" name="5" size="32" onkeydown="onChange();"/></br>
+				SEG1g : <input type="text" name="6" size="32" onkeydown="onChange();"/></br>
+				SEG1p : <input type="text" name="7" size="32" onkeydown="onChange();"/></br>
+			</div>
+			<div class="form-block" id="seg2">
+				<span class="title">Afficheur 7 segments 2</span></br>
+				SEG2a : <input type="text" name="0" size="32" onkeydown="onChange();"/></br>
+				SEG2b : <input type="text" name="1" size="32" onkeydown="onChange();"/></br>
+				SEG2c : <input type="text" name="2" size="32" onkeydown="onChange();"/></br>
+				SEG2d : <input type="text" name="3" size="32" onkeydown="onChange();"/></br>
+				SEG2e : <input type="text" name="4" size="32" onkeydown="onChange();"/></br>
+				SEG2f : <input type="text" name="5" size="32" onkeydown="onChange();"/></br>
+				SEG2g : <input type="text" name="6" size="32" onkeydown="onChange();"/></br>
+				SEG2p : <input type="text" name="7" size="32" onkeydown="onChange();"/></br>
+			</div>
+			<div class="form-block" id="dip">
+				<span class="title">DIP switchs</span></br>
+				SW0 : <input type="text" name="0" size="32" onkeydown="onChange();"/></br>
+				SW1 : <input type="text" name="1" size="32" onkeydown="onChange();"/></br>
+				SW2 : <input type="text" name="2" size="32" onkeydown="onChange();"/></br>
+				SW3 : <input type="text" name="3" size="32" onkeydown="onChange();"/></br>
+				SW4 : <input type="text" name="4" size="32" onkeydown="onChange();"/></br>
+				SW5 : <input type="text" name="5" size="32" onkeydown="onChange();"/></br>
+				SW6 : <input type="text" name="6" size="32" onkeydown="onChange();"/></br>
+				SW7 : <input type="text" name="7" size="32" onkeydown="onChange();"/></br>
+			</div>
+			<div class="form-block" id="swi">
+				<span class="title">Interrupteur</span></br>
+				S1 : <input type="text" name="1" size="32" onkeydown="onChange();"/></br>
+				S2 : <input type="text" name="2" size="32" onkeydown="onChange();"/></br>
+				S3 : <input type="text" name="3" size="32" onkeydown="onChange();"/></br>
+				S4 : <input type="text" name="4" size="32" onkeydown="onChange();"/></br>
+				S5 : <input type="text" name="5" size="32" onkeydown="onChange();"/></br>
+				S6 : <input type="text" name="6" size="32" onkeydown="onChange();"/></br>
+				S7 : <input type="text" name="7" size="32" onkeydown="onChange();"/></br>
+				S8 : <input type="text" name="8" size="32" onkeydown="onChange();"/></br>
+			</div>
+			<div class="form-block" id="bp">
+				<span class="title">Boutons poussoirs</span></br>
+				S9 : <input type="text" name="9" size="32" onkeydown="onChange();"/></br>
+				S10 : <input type="text" name="10" size="32" onkeydown="onChange();"/></br>
+			</div>
+			<div class="form-block" id="clk">
+				<span class="title">Horloge</span></br>
+				Clk : <input type="text" name="0" size="32" onkeydown="onChange();"/></br>
+			</div>
+			
+			
+			<div class="form-block">
+				<span class="title">Faites vos fichiers facilement !</span>
+				<a href="VHDL_constructor.html">ici !</a>
+			</div>
+		</div>
+		
+		<div style="display:inline-block; vertical-align:top;">
+			<!-- Selectable output -->
+			<div class="title" id="title"></div>
+			<textarea id="outText"></textarea>
+		</div>
+	</body>
+</html>

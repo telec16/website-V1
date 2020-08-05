@@ -1,0 +1,220 @@
+<html>
+	<head>
+    <meta charset="utf-8" />
+
+		<title>Coil calculation</title>
+
+		<link rel="stylesheet" href="/styleForm.css" />
+		<link rel="stylesheet" href="/styleADL.css" />
+		<script type='text/javascript' src='../utils.js'></script>
+
+		<script type='text/javascript'>
+		var type;
+		var length;
+		var thickness;
+		var width;
+		var height;
+		var diameter;
+		var wire;
+		var litz;
+		var turns;
+
+		var round_div;
+		var rect_div;
+
+		var length_out;
+		var layers_out;
+		var turn_layer_out;
+		var thick_out;
+
+
+		function start(){
+			type = document.getElementById("selectType");
+			length = document.getElementById("length");
+			thickness = document.getElementById("thickness");
+			width = document.getElementById("width");
+			height = document.getElementById("height");
+			diameter = document.getElementById("diam");
+			wire = document.getElementById("wire");
+			litz = document.getElementById("litz");
+			turns = document.getElementById("turns");
+
+			round_div = document.getElementById("round");
+			rect_div = document.getElementById("rect");
+
+			length_out = document.getElementById("Ltot_O");
+			layers_out = document.getElementById("layers_O");
+			rows_out = document.getElementById("Nlayer_O");
+			leftOver_out = document.getElementById("Nleft_O");
+			thick_out = document.getElementById("thick_O");
+			
+			onChange(true);
+		}
+
+		function onChange(bypass)
+		{
+			bypass = bypass || false;
+			if(document.getElementById("autoChange").checked || bypass){
+				var l = floatOf(length);
+				var maxThick = floatOf(thickness);
+				var w = floatOf(width);
+				var h = floatOf(height);
+				var D = floatOf(diameter);
+				var d = floatOf(wire);
+				var L = floatOf(litz);
+				var N = floatOf(turns);
+
+				N *= L;
+				var rows = Math.floor(l/d);
+				var layers = Math.floor(N/rows);
+				var leftOver = Math.ceil((N/rows - layers) * rows);
+				var thick = (layers + !!leftOver) * d;
+
+				switch(type.value){
+						case "round":
+							round.style["display"] = "initial";
+							rect.style["display"] = "none";
+
+							//Ltot = 0; for(k=0;k<layers;k++) Ltot += rows*2*Math.PI*(D+d+2*k*d); Ltot += leftOver*2*Math.PI*(D+d+2*layers*d)
+							var wire_length = ((layers-1)*(layers)/2) * rows*4*Math.PI*d +
+																layers * rows * 2*Math.PI * (D+d) +
+																leftOver * 2*Math.PI * (D + d + 2*layers*d);
+						break;
+						case "rect":
+							round.style["display"] = "none";
+							rect.style["display"] = "initial";
+							
+							//Ltot = 0; for(k=0;k<layers;k++) Ltot += rows*(2*L+2*h+4*d+8*k*d); Ltot += leftOver*((2*L+2*h+4*d+8*(layers)*d))
+							var wire_length = ((layers-1)*(layers)/2) * 8*rows*d +
+																layers * rows * (2*w + 2*h + 4*d) +
+																leftOver * (2*w + 2*h + 4*d + 8*layers*d);
+						break;
+				}
+
+				var accuracy = parseInt(document.getElementById("prec").value);
+
+				setFloat(length_out, wire_length * 1e-3, accuracy);
+				setFloat(thick_out, thick, accuracy);
+				setFloat(layers_out, layers, 0);
+				setFloat(rows_out, rows, 0);
+				setFloat(leftOver_out, leftOver, 0);
+				
+				if(thick>=maxThick)
+					thick_out.style["background-color"] = "lightcoral";
+				else if(thick>=(.75*maxThick))
+					thick_out.style["background-color"] = "lightyellow";
+				else
+					thick_out.style["background-color"] = "lightgreen";
+			}
+		}
+		
+		//Référence	Bmax (mT)	Ae (mm²)	Al (nH)	Do (mm)	Di (mm)	h (mm)	N1 (T)	N2 (T)	Ntotal (T)	I1 (A)	Sfil (mm²)	Smax (mm²)	OK ?
+		function updateFromCB(field){
+			data = field.value;
+			field.value = "";
+			
+			data = data.replace(/,/g, '.');
+			data = data.split('\t');
+			
+			length.value = parseFloat(data[6]);
+			thickness.value = parseFloat(data[4])-parseFloat(data[5]);
+			diameter.value = parseFloat(data[5]);
+			turns.value = parseFloat(data[9]);
+			
+			onChange(true);
+		}
+		</script>
+
+	</head>
+
+	<body onload="start()">
+
+		<div class="form-vertical">
+			<div class="form-block">
+				<span class="title">Dimensions du pot</span>
+				<div>
+					<div class="form-vertical">
+						<div class="subtitle">Type</div>
+						<select id="selectType" onchange="onChange(true);">
+						   <option value="rect">Brique</option>
+						   <option value="round">Cylindre</option>
+						</select>
+					</div>
+					<div class="form-vertical">
+						<div class="subtitle">Longueur (mm)</div>
+						<input type="text" id="length" onkeyup="onChange();"/>
+					</div>
+					<div class="form-vertical">
+						<div class="subtitle">Epaisseur max (mm)</div>
+						<input type="text" id="thickness" onkeyup="onChange();"/>
+					</div>
+					<span id="round" style="display: initial">
+					<div class="form-vertical">
+						<div class="subtitle">Diamètre (mm)</div>
+						<input type="text" id="diam" onkeyup="onChange();"/>
+					</div>
+					</span>
+					<span id="rect" style="display: none">
+					<div class="form-vertical">
+						<div class="subtitle">Largeur (mm)</div>
+						<input type="text" id="width" onkeyup="onChange();"/>
+					</div>
+					<div class="form-vertical">
+						<div class="subtitle">Hauteur (mm)</div>
+						<input type="text" id="height" onkeyup="onChange();"/>
+					</div>
+					</span>
+				</div>
+			</div>
+
+			<div class="form-block">
+				<span class="title">Dimensions du fil</span>
+				<div>
+					<div class="form-vertical">
+						<div class="subtitle">Diametre du fil (mm)</div>
+						<input type="text" id="wire" onkeyup="onChange();"/>
+					</div>
+					<div class="form-vertical">
+						<div class="subtitle">Nombre de brins (fil de Litz)</div>
+						<input type="text" id="litz" onkeyup="onChange();"/>
+					</div>
+					<div class="form-vertical">
+						<div class="subtitle">Nombre de tours</div>
+						<input type="text" id="turns" onkeyup="onChange();"/>
+					</div>
+				</div>
+			</div>
+
+			<div class="form-block">
+				<span class="title">Résultats</span>
+				<div>
+					<div class="form-vertical">
+					Longueur totale du fil (m)</br>
+					Epaisseur (mm)</br>
+					Couches</br>
+					Spires par couche</br>
+					Spires restantes</br>
+					</div>
+					<div class="form-vertical">
+					 : <span id="Ltot_O"></span></br>
+					 : <span id="thick_O"></span></br>
+					 : <span id="layers_O"></span></br>
+					 : <span id="Nlayer_O"></span></br>
+					 : <span id="Nleft_O"></span></br>
+					</div>
+				</div>
+			</div>
+
+			<div class="form-block">
+				<span class="title">Paramètres</span>
+				<div class="subtitle">Initialiser depuis le presse-papier</div>
+				<input type="text" onchange = "updateFromCB(this);" value=""></input>
+				<div class="subtitle">Actualisation automatique</div>
+				<input type="checkbox" id="autoChange" checked>On</input>
+				<input type="button" onclick = "onChange(true);" value="Actualiser"></input>
+				<div class="subtitle">Précision</div>
+				<input type="range" min="0" max="10" value="3" id="prec" oninput="onChange(true);"/>
+			</div>
+		</div>
+	</body>
+</html>

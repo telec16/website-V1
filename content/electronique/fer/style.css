@@ -1,0 +1,36 @@
+img {
+	max-width: 5em;
+	max-height: 5em;
+}
+
+table {
+	width: 60%;
+	border-style: double;
+}
+table.connectors {
+	border-color: silver;
+}
+table.stations {
+	border-color: aqua;
+}
+table.handles {
+	border-color: crimson;
+}
+
+thead .brand {
+	width: 4em;
+}
+tbody .brand {
+	writing-mode:  sideways-lr;
+	padding-left: 1.5em;
+}
+
+table td{
+	border-style: groove;
+	border-width: 1px;
+	padding-left: 1em;
+}
+table th{
+	border-style: outset;
+	border-width: 2px;
+}

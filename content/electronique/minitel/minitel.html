@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Minitel</title>
+	</head>
+    <body>
+	<p>Vous avez un Minitel qui traine chez vous ?</p>
+	<p>Vous avec un peu (beaucoup) de temps libre ?</p>
+	<p>Reprogrammez-le !</p>
+	<p>Après un peu de test de trace, on arrive à un schéma plutôt potable:</p>
+	<div style="text-align:center"><a href="SAM_1278.JPG"><img src="SAM_1278.JPG" width="200" height="193" border="0" /></a></div>
+	
+	<p>Qui nous dit que :</p>
+	<ul><li>La broche Tx (3 sur la prise DIN) est reliée à la broche 11 du 8052</li>
+	<li>La broche Rx (1) est reliée à la broche 10</li>
+	<li>La broche PT (4) est reliée à la broche 14 pour la sortie et 8 pour l'entrée</li>
+	<li>Le relai est sur la 5</li>
+	<li>La sortie du clavier est sur &lt;1:8&gt;</li>
+	<li>L'entrée du clavier est sur &lt;3:1&gt;</li>
+	<li>Le port de communication graphique (EF9345) est sur &lt;39:32&gt;</li><li>Les broches AS, DS, et R/W sont respectivement en 30, 17, 16.</li>
+	<li>La broche CS est à la masse.</li>
+	<li>Le buzzer est sur la sortie I du EF9345</li></ul>
+	
+	<p>Maintenant, si vous ne voulez pas utiliser le 8052 (ce qui est mon cas), il faut l'enlever, puis le remplacer par&nbsp; votre µC:</p>
+	<a href="SAM_1277.JPG"><img src="SAM_1277.JPG" width="320" height="180" border="0" /></a>
+	
+	<p>Commencez par mettre un fil sur les fonctions que vous souhaitez (avec une nappe c'est plus simple).</p>
+	<a href="SAM_1279.JPG"><img src="SAM_1279.JPG" width="320" height="180" border="0" /></a>
+	
+	<p>Puis reliez votre µC (faite bien attention au brochage !).</p>
+	<a href="SAM_1284.JPG"><img src="SAM_1284.JPG" width="320" height="180" border="0" /></a>
+	
+	<p>Il faut aussi prevoir une diode pour ne pas alimenter la carte lors de la programmation, et une résistance de pull-up sur la broche de reset (si vous programmez en 12V, faite attention à ne pas la relier directement).</p>
+	<div style="font-family: monospaced">
+	Vcc<sub>carte</sub>--[&gt;|--Vcc<sub>µc</sub>--Vcc<sub>prog</sub><br>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BAT42<br>
+	Vcc<sub>carte</sub>--/\/\/--Reset<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;10K
+	</div>
+	
+	<a href="SAM_1283.JPG"><img src="SAM_1283.JPG" width="320" height="180" border="0" /></a>
+	<p>Et finalement j'ai relié une prise téléphonique aux pins de programmation.</p>
+	<p>J'ai mis mon code en téléchargement, ainsi que la datasheet du EF9345.</p>
+    </body>
+</html>

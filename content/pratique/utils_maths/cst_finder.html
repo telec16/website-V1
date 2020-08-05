@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>Number finder</title>
+		<style>
+		table, th, td {
+    border: 2px solid black;
+    border-collapse: collapse;
+		text-align: center;
+		}
+		th, td{
+		width:5em;
+		}
+		</style>
+		<link rel="stylesheet" href="/styleADL.css" />
+		<script type='text/javascript' src='../utils.js'></script>
+		<script type='text/javascript'>
+		function find(number, magnitude, cst)
+		{
+			var min_err=100;
+			var ratio = [];
+			
+			if(number*cst == 0) return [0, 1, 0, 0];
+			
+			for(var den=1; den<=9; den++){
+				for(var num=1; num<=9; num++){
+					var nb=(num/den)*cst*magnitude;
+					var err = Math.abs(nb-number)/number;
+					if(err < min_err){
+						min_err=err;
+						ratio = [num*((magnitude>1)?magnitude:1), den/((magnitude<1)?magnitude:1), err, nb];
+					}
+				}
+			}
+			
+			return ratio
+		}
+		
+		function getMagnitude(number, cst){
+			var mag=1;
+			
+			while(9*cst*mag < number)
+				mag *= 10;
+				
+			while(cst*mag/9 > number)
+				mag /= 10;
+				
+			return mag;
+		}
+		
+		function change(){
+			nb = floatOf(document.getElementById("nb"), 0);
+			cus = document.getElementById("custom").value || "0";
+			
+			var cstBase = [Math.PI, Math.sqrt(2), Math.sqrt(3), Math.sqrt(5), eval(cus)];
+			
+			var ratios = [];
+			for(cst of cstBase){
+					var mag = getMagnitude(nb, cst);
+					var ratio = find(nb, mag, cst);
+					ratios.push(ratio);
+			}
+			
+			drawTable(ratios);
+		}
+		
+		function drawTable(ratios){
+			var str_r = "<td>Ratio</td>";
+			var str_n = "<td>Real</td>";
+			var str_e = "<td>Error</td>";
+			
+			for(r of ratios){
+					str_r += "<td>";
+					str_r += r[0]+"/"+r[1];
+					str_r += "</td>";
+					
+					str_n += "<td>";
+					str_n += r[3].toFixed(3);
+					str_n += "</td>";
+					
+					str_e += "<td>";
+					str_e += (r[2]*100).toFixed(2) + "%";
+					str_e += "</td>";
+			}
+			
+			document.getElementById("ratio").innerHTML = str_r;
+			document.getElementById("real").innerHTML = str_n;
+			document.getElementById("error").innerHTML = str_e;
+		}
+		</script>
+	</head>
+
+	<body>
+	<p>
+		<input type="text" value="6.28" id="nb" name="nb" onkeyup="change();"/>
+		<label for="nb">Constant to revert</label>
+	</p>
+	<table>
+	<thead><th><td>Pi</td><td>sqrt(2)</td><td>sqrt(3)</td><td>sqrt(5)</td><td><input type="text" placeholder="Custom" id="custom"  onchange="change();"/></td></th></thead>
+	<tr id="ratio"><td>Ratio</td></tr>
+	<tr id="real"><td>Real</td></tr>
+	<tr id="error"><td>Error</td></tr>
+	</table>
+	</body>
+</html>
