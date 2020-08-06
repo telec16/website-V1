@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		
+		<title>Filters</title>
+		
+		<style>
+			input[type=text] { width:3em; }
+			table { border-collapse: collapse; }
+			tr { height:32px; border: none;}
+			td{ text-align:center;}
+		</style>
+		
+		<link rel="stylesheet" href="/styleADL.css" />
+		<script type='text/javascript' src='../utils.js'></script>
+		<script type='text/javascript'>
+			handler=null;
+			function timer(type){
+				clearTimeout(handler);
+				handler = setTimeout(change, 500, type);
+			}
+			
+			function change(type){
+				target = document.querySelector('input[name="target"]:checked').value;
+				H_div = document.getElementById("H");
+				R1_input = document.getElementById("R1");
+				R2_input = document.getElementById("R2");
+				C1_input = document.getElementById("C1");
+				C2_input = document.getElementById("C2");
+				Rf_input = document.getElementById("Rf");
+				K_input = document.getElementById("K");
+				F0_input = document.getElementById("F0");
+				Q_input = document.getElementById("Q");
+				serie_input = document.getElementById("serie");
+				
+				ctx = document.getElementById("cnv").getContext("2d");
+				
+				//Change picture
+				topo = document.getElementById("topology").value;
+				document.getElementById("circuit").src = topo+".png";
+				
+				//Change configuration
+				if(type == "config"){
+					switch(topo){
+						case "SKlp":
+							H_div.innerHTML = "";
+						break;
+						case "SKhp":
+							H_div.innerHTML = "";
+						break;
+						case "SKbp":
+							H_div.innerHTML = "";
+						break;
+					}
+					
+					switch(target){
+						case "comp":
+							R1_input.disabled = 
+							R2_input.disabled = 
+							C1_input.disabled = 
+							C2_input.disabled = 
+							Rf_input.disabled = true;
+							K_input.disabled = false;
+							F0_input.disabled = 
+							Q_input.disabled = false;
+						break;
+						case "gain":
+							R1_input.disabled = 
+							R2_input.disabled = 
+							C1_input.disabled = 
+							C2_input.disabled = false;
+							Rf_input.disabled = topo != "SKbp";
+							K_input.disabled = true;
+							F0_input.disabled = 
+							Q_input.disabled = false;
+						break;
+						case "spec":
+							R1_input.disabled = 
+							R2_input.disabled = 
+							C1_input.disabled = 
+							C2_input.disabled = false;
+							Rf_input.disabled = topo != "SKbp";
+							K_input.disabled = false;
+							F0_input.disabled = 
+							Q_input.disabled = true;
+						break;
+					}
+				}
+				
+				//Get fields values
+				R1 = Math.abs(floatOf(R1_input, 10 )) * 1e3 ;
+				R2 = Math.abs(floatOf(R2_input, 10 )) * 1e3 ;
+				C1 = Math.abs(floatOf(C1_input, 4.7)) * 1e-9;
+				C2 = Math.abs(floatOf(C2_input, 4.7)) * 1e-9;
+				Rf = Math.abs(floatOf(Rf_input, 1  )) * 1e3 ;
+				K  = Math.abs(floatOf(K_input , 1  )) * 1e0 ;
+				F0 = Math.abs(floatOf(F0_input, 1  )) * 1e3 ;
+				Q  = Math.abs(floatOf(Q_input , 1.41))* 1e0 ;
+				w0 = 2*Math.PI*F0;
+				
+				//Compute components
+				if(target == "comp"){
+					switch(topo){
+						case "SKlp":
+							R1 = 10;
+							R2 = 10;
+							C1 = 4.7;
+							C2 = 4.7;
+						break;
+						case "SKhp":
+							R1 = 10;
+							R2 = 10;
+							C1 = 4.7;
+							C2 = 4.7;
+						break;
+						case "SKbp":
+							R1 = 10;
+							R2 = 10;
+							C1 = 4.7;
+							C2 = 4.7;
+							Rf=1;
+						break;
+					}
+				}
+				
+				//Get closest resistance serie
+				if(type == "serie" && target != "comp"){
+					s = floatOf(serie_input, 12);
+					serie = getResistorSerie(s);
+					
+					R1 = closestInList(serie, R1);
+					R2 = closestInList(serie, R2);	
+					Rf = closestInList(serie, Rf);					
+					
+				}
+				
+				//Compute gain
+				if(target == "gain"){
+					switch(topo){
+						case "SKlp":
+							K = 1 - ( (1/(Q*w0) - C2*(R1+R2)) / (R1*C1) );
+						break;
+						case "SKhp":
+							K = 1;
+						break;
+						case "SKbp":
+							K = 1;
+						break;
+					}
+				}
+				
+				//Compute spec
+				if(target == "spec"){
+					switch(topo){
+						case "SKlp":
+							w0 = 1/Math.sqrt(R1*R2*C1*C2);
+							Q = 1/w0 * 1/(C2*(R1+R2) + (R1*C1*(1-K)));
+						break;
+						case "SKhp":
+							w0 = 1;
+							Q = 1.41;
+						break;
+						case "SKbp":
+							w0 = 1;
+							Q = 1.41;
+						break;
+					}
+				}
+				
+				//Create function
+				switch(topo){
+					case "SKlp":
+						fct = function(f) { return 1;}
+					break;
+					case "SKhp":
+						fct = function(f) { return 1;}
+					break;
+					case "SKbp":
+						fct = function(f) { return 1;}
+					break;
+				}
+				
+				//Set fields (1/Infinity => NaN => 0)
+				var acc = 2;
+				F0 = w0/(2*Math.PI);
+				setValue(R1_input, (R1||0)* 1e-3, acc);
+				setValue(R2_input, (R2||0)* 1e-3, acc);
+				setValue(C1_input, (C1||0)* 1e9 , acc);
+				setValue(C2_input, (C2||0)* 1e9 , acc);
+				setValue(Rf_input, (Rf||0)* 1e-3, acc);
+				setValue(K_input , (K ||0)* 1e0 , acc);
+				setValue(F0_input, (F0||0)* 1e-3, acc);
+				setValue(Q_input , (Q ||0)* 1e0 , acc);
+				
+				drawFct(ctx, fct, 300, 230);
+			}
+			
+		function drawFct(ctx, fct, xSize, ySize){
+			var alpha, gain;
+			var Ca,Cg;
+			var max, min;
+			
+			//Auto-set range
+			for(Ca=0; Ca<xSize; Ca++){
+				alpha = map(Ca, 0, xSize-1, 0, 1);
+				gain = fct(alpha);
+				
+				//Setup min and max
+				if(Ca==0){
+					max=gain;
+					min=gain;
+				}
+				else{
+					max = Math.max(max, gain);
+					min = Math.min(min, gain);
+				}
+			}
+			
+			//Actual drawing
+			ctx.fillStyle = "white";
+			ctx.fillRect(0, 0, xSize, ySize);
+			ctx.fillStyle = "black";
+			for(Ca=0; Ca<xSize; Ca++){
+				alpha = map(Ca, 0, xSize-1, 0, 1);
+				gain = fct(alpha);
+				Cg = map(gain, min, max, 0, ySize-1);
+				ctx.fillRect(Ca, ySize-Cg-1, 1, -1);
+			}
+		}
+			
+		</script>
+	</head>
+	
+	<body onload="change('config');">
+		<div>
+			<div style="display:inline-block;">
+			<table>
+				<tr><td colspan="6">
+				<select id="topology" onchange="change('config');">
+					<option value="SKlp">Sallen-key, low-pass</option>
+					<option value="SKhp">Sallen-key, high-pass</option>
+					<option value="SKbp">Sallen-key, band-pass</option>
+				</select>
+				</td></tr>
+				<tr><td style="border-right-style: groove;">Target</td><td>H(p)=</td><td colspan="4" id="H"></td></tr>
+				<tr style="border-top-style: double;"><td rowspan="2" style="border-right-style: groove;"><input type="radio" name="target" value="comp" onchange="change('config');"/></td><td>R1</td><td>R2</td><td>C1</td><td>C2</td><td>Rf</td></tr>
+				<tr><td><input type="text" id="R1" onkeyup="timer('comp');"/></td>
+						<td><input type="text" id="R2" onkeyup="timer('comp');"/></td>
+						<td><input type="text" id="C1" onkeyup="timer('comp');"/></td>
+						<td><input type="text" id="C2" onkeyup="timer('comp');"/></td>
+						<td><input type="text" id="Rf" onkeyup="timer('comp');"/></td></tr>
+				<tr style="border-top-style: double;"><td style="border-right-style: groove;"><input type="radio" name="target" value="gain" onchange="change('config');"/><td colspan="3">K=1+Rb/Ra=</td><td colspan="2"><input type="text" id="K" onkeyup="timer('gain');"/></td></tr>
+				<tr style="border-top-style: double;"><td rowspan="2" style="border-right-style: groove;"><input type="radio" name="target" value="spec" onchange="change('config');" checked/></td><td colspan="2">F0</td><td colspan="2">Q</td></tr>
+				<tr><td colspan="2"><input type="text" id="F0" onkeyup="timer('spec');"/></td>
+				    <td colspan="2"><input type="text" id="Q" onkeyup="timer('spec');"/></td></tr>
+				<tr style="border-top-style: double;"><td colspan="6">
+					Get closest <select id="serie" onchange="change('serie');">
+						<option value="6">E6</option>
+						<option value="12" selected>E12</option>
+						<option value="24">E24</option>
+						<option value="48">E48</option>
+						<option value="96">E96</option>
+						<option value="192">E192</option>
+					</select> serie <input type="button" value="update" onclick="change('serie');" />
+				</td></tr>
+			</table>
+			</div><div style="display:inline-block;">
+			<img src="SKlp.png" id="circuit" width="460" height="230" alt="OpAmp circuit"/>
+			</div><div style="display:inline-block;">
+			<canvas id="cnv" width="300" height="230" alt="Gain vs frequency"/>
+			</div>
+		</div>
+		(Resistors in kohms, Capacitors in nF, Frequencies in kHz)
+	</body>
+</html>
+				
