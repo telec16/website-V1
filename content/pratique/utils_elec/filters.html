@@ -13,6 +13,7 @@
 		</style>
 		
 		<link rel="stylesheet" href="/styleADL.css" />
+		<script type='text/javascript' src='https://unpkg.com/mathjs@7.1.0/dist/math.min.js'></script>
 		<script type='text/javascript' src='../utils.js'></script>
 		<script type='text/javascript'>
 			handler=null;
@@ -22,17 +23,19 @@
 			}
 			
 			function change(type){
-				target = document.querySelector('input[name="target"]:checked').value;
 				H_div = document.getElementById("H");
 				R1_input = document.getElementById("R1");
 				R2_input = document.getElementById("R2");
 				C1_input = document.getElementById("C1");
 				C2_input = document.getElementById("C2");
 				Rf_input = document.getElementById("Rf");
-				K_input = document.getElementById("K");
+				K_input  = document.getElementById("K");
 				F0_input = document.getElementById("F0");
-				Q_input = document.getElementById("Q");
+				Q_input  = document.getElementById("Q");
 				serie_input = document.getElementById("serie");
+				
+				lockR = document.getElementById("lockR").checked;
+				lockC = document.getElementById("lockC").checked;
 				
 				ctx = document.getElementById("cnv").getContext("2d");
 				
@@ -42,48 +45,21 @@
 				
 				//Change configuration
 				if(type == "config"){
+					R2_input.disabled = lockR;
+					C2_input.disabled = lockC;
+					
 					switch(topo){
 						case "SKlp":
+							Rf_input.disabled = true;
 							H_div.innerHTML = "";
 						break;
 						case "SKhp":
+							Rf_input.disabled = true;
 							H_div.innerHTML = "";
 						break;
 						case "SKbp":
+							Rf_input.disabled = false;
 							H_div.innerHTML = "";
-						break;
-					}
-					
-					switch(target){
-						case "comp":
-							R1_input.disabled = 
-							R2_input.disabled = 
-							C1_input.disabled = 
-							C2_input.disabled = 
-							Rf_input.disabled = true;
-							K_input.disabled = false;
-							F0_input.disabled = 
-							Q_input.disabled = false;
-						break;
-						case "gain":
-							R1_input.disabled = 
-							R2_input.disabled = 
-							C1_input.disabled = 
-							C2_input.disabled = false;
-							Rf_input.disabled = topo != "SKbp";
-							K_input.disabled = true;
-							F0_input.disabled = 
-							Q_input.disabled = false;
-						break;
-						case "spec":
-							R1_input.disabled = 
-							R2_input.disabled = 
-							C1_input.disabled = 
-							C2_input.disabled = false;
-							Rf_input.disabled = topo != "SKbp";
-							K_input.disabled = false;
-							F0_input.disabled = 
-							Q_input.disabled = true;
 						break;
 					}
 				}
@@ -96,23 +72,32 @@
 				Rf = Math.abs(floatOf(Rf_input, 1  )) * 1e3 ;
 				K  = Math.abs(floatOf(K_input , 1  )) * 1e0 ;
 				F0 = Math.abs(floatOf(F0_input, 1  )) * 1e3 ;
-				Q  = Math.abs(floatOf(Q_input , 1.41))* 1e0 ;
+				Q  = floatOf(Q_input , 1.41)* 1e0 ;
 				w0 = 2*Math.PI*F0;
 				
+				//Match the values
+				if(lockR) R2 = R1;
+				if(lockC) C2 = C1;
+				
 				//Compute components
-				if(target == "comp"){
+				if(type == "spec"){
 					switch(topo){
 						case "SKlp":
-							R1 = 10;
-							R2 = 10;
-							C1 = 4.7;
-							C2 = 4.7;
+							if(!lockR)
+								R1 = 1/(w0**2) * 1/(R2*C1*C2);
+							else
+								R1 = R2 = 1/(w0 * Math.sqrt(C1*C2));
+							//R2 = 1/(w0**2) * 1/(R1*C1*C2);
+							//C1 = 1/(w0**2) * 1/(R1*R2*C1);
+							//C2 = 1/(w0**2) * 1/(R1*R2*C2);
+							K = 1 - ( (1/(Q*w0) - C2*(R1+R2)) / (R1*C1) );
 						break;
 						case "SKhp":
 							R1 = 10;
 							R2 = 10;
 							C1 = 4.7;
 							C2 = 4.7;
+							K = 1;
 						break;
 						case "SKbp":
 							R1 = 10;
@@ -120,12 +105,13 @@
 							C1 = 4.7;
 							C2 = 4.7;
 							Rf=1;
+							K = 1;
 						break;
 					}
 				}
 				
 				//Get closest resistance serie
-				if(type == "serie" && target != "comp"){
+				if(type == "serie"){
 					s = floatOf(serie_input, 12);
 					serie = getResistorSerie(s);
 					
@@ -135,23 +121,8 @@
 					
 				}
 				
-				//Compute gain
-				if(target == "gain"){
-					switch(topo){
-						case "SKlp":
-							K = 1 - ( (1/(Q*w0) - C2*(R1+R2)) / (R1*C1) );
-						break;
-						case "SKhp":
-							K = 1;
-						break;
-						case "SKbp":
-							K = 1;
-						break;
-					}
-				}
-				
 				//Compute spec
-				if(target == "spec"){
+				if(type == "comp" || type == "config"){
 					switch(topo){
 						case "SKlp":
 							w0 = 1/Math.sqrt(R1*R2*C1*C2);
@@ -171,13 +142,13 @@
 				//Create function
 				switch(topo){
 					case "SKlp":
-						fct = function(f) { return 1;}
+						fct = function(p) { return math.complex(K).div( p.div(w0).pow(2). add(p.div(Q*w0)). add(1) );} //K/(1 + p/(Q*w0) + (p/w0)**2)
 					break;
 					case "SKhp":
-						fct = function(f) { return 1;}
+						fct = function(p) { return 1;}
 					break;
 					case "SKbp":
-						fct = function(f) { return 1;}
+						fct = function(p) { return 1;}
 					break;
 				}
 				
@@ -193,18 +164,21 @@
 				setValue(F0_input, (F0||0)* 1e-3, acc);
 				setValue(Q_input , (Q ||0)* 1e0 , acc);
 				
-				drawFct(ctx, fct, 300, 230);
+				drawFct(ctx, fct, w0, 300, 230);
 			}
 			
-		function drawFct(ctx, fct, xSize, ySize){
-			var alpha, gain;
+		function drawFct(ctx, fct, w0, xSize, ySize){
+			var p, gain;
 			var Ca,Cg;
 			var max, min;
+			var fmax, fmin;
+			fmin = 0//w0-w0*3/4;
+			fmax = 200e3//w0+w0*3/4;
 			
 			//Auto-set range
 			for(Ca=0; Ca<xSize; Ca++){
-				alpha = map(Ca, 0, xSize-1, 0, 1);
-				gain = fct(alpha);
+				p = math.complex('i').mul(map(Ca, 0, xSize-1, fmin, fmax));
+				gain = 20*Math.log(fct(p).abs());
 				
 				//Setup min and max
 				if(Ca==0){
@@ -222,8 +196,8 @@
 			ctx.fillRect(0, 0, xSize, ySize);
 			ctx.fillStyle = "black";
 			for(Ca=0; Ca<xSize; Ca++){
-				alpha = map(Ca, 0, xSize-1, 0, 1);
-				gain = fct(alpha);
+				p = math.complex('i').mul(map(Ca, 0, xSize-1, fmin, fmax));
+				gain = 20*Math.log(fct(p).abs());
 				Cg = map(gain, min, max, 0, ySize-1);
 				ctx.fillRect(Ca, ySize-Cg-1, 1, -1);
 			}
@@ -236,25 +210,33 @@
 		<div>
 			<div style="display:inline-block;">
 			<table>
-				<tr><td colspan="6">
+				<tr><td colspan="5">
 				<select id="topology" onchange="change('config');">
 					<option value="SKlp">Sallen-key, low-pass</option>
 					<option value="SKhp">Sallen-key, high-pass</option>
 					<option value="SKbp">Sallen-key, band-pass</option>
 				</select>
 				</td></tr>
-				<tr><td style="border-right-style: groove;">Target</td><td>H(p)=</td><td colspan="4" id="H"></td></tr>
-				<tr style="border-top-style: double;"><td rowspan="2" style="border-right-style: groove;"><input type="radio" name="target" value="comp" onchange="change('config');"/></td><td>R1</td><td>R2</td><td>C1</td><td>C2</td><td>Rf</td></tr>
+				
+				<tr><td>H(p)=</td><td colspan="4" id="H"></td></tr>
+				
+				<tr style="border-top-style: double;"></td><td>R1</td><td>R2</td><td>C1</td><td>C2</td><td>Rf</td></tr>
+				<tr style="height:16px;">
+						<td colspan="2"><input type="checkbox" id="lockR" onchange="change('config');"/></td>
+						<td colspan="2"><input type="checkbox" id="lockC" onchange="change('config');"/></td></tr>
 				<tr><td><input type="text" id="R1" onkeyup="timer('comp');"/></td>
 						<td><input type="text" id="R2" onkeyup="timer('comp');"/></td>
 						<td><input type="text" id="C1" onkeyup="timer('comp');"/></td>
 						<td><input type="text" id="C2" onkeyup="timer('comp');"/></td>
 						<td><input type="text" id="Rf" onkeyup="timer('comp');"/></td></tr>
-				<tr style="border-top-style: double;"><td style="border-right-style: groove;"><input type="radio" name="target" value="gain" onchange="change('config');"/><td colspan="3">K=1+Rb/Ra=</td><td colspan="2"><input type="text" id="K" onkeyup="timer('gain');"/></td></tr>
-				<tr style="border-top-style: double;"><td rowspan="2" style="border-right-style: groove;"><input type="radio" name="target" value="spec" onchange="change('config');" checked/></td><td colspan="2">F0</td><td colspan="2">Q</td></tr>
-				<tr><td colspan="2"><input type="text" id="F0" onkeyup="timer('spec');"/></td>
+						
+				<tr style="border-top-style: double;"><td colspan="3">K=1+Rb/Ra=</td><td colspan="2"><input type="text" id="K" onkeyup="timer('comp');"/></td></tr>
+				
+				<tr style="border-top-style: double;"><td colspan="2">F0</td><td></td><td colspan="2">Q</td></tr>
+				<tr><td colspan="2"><input type="text" id="F0" onkeyup="timer('spec');"/></td><td></td>
 				    <td colspan="2"><input type="text" id="Q" onkeyup="timer('spec');"/></td></tr>
-				<tr style="border-top-style: double;"><td colspan="6">
+						
+				<tr style="border-top-style: double;"><td colspan="5">
 					Get closest <select id="serie" onchange="change('serie');">
 						<option value="6">E6</option>
 						<option value="12" selected>E12</option>
