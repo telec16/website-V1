@@ -2,16 +2,16 @@
 <html>
 	<head>
 		<meta charset="UTF-8"/>
-		
+
 		<title>Filters</title>
-		
+
 		<style>
 			input[type=text] { width:3em; }
 			table { border-collapse: collapse; }
 			tr { height:32px; border: none;}
 			td{ text-align:center;}
 		</style>
-		
+
 		<link rel="stylesheet" href="/styleADL.css" />
 		<script type='text/javascript' src='https://unpkg.com/mathjs@7.1.0/dist/math.min.js'></script>
 		<script type='text/javascript' src='../utils.js'></script>
@@ -21,33 +21,33 @@
 				clearTimeout(handler);
 				handler = setTimeout(change, 500, type);
 			}
-			
+
 			function change(type){
-				H_div = document.getElementById("H");
-				R1_input = document.getElementById("R1");
-				R2_input = document.getElementById("R2");
-				C1_input = document.getElementById("C1");
-				C2_input = document.getElementById("C2");
-				Rf_input = document.getElementById("Rf");
-				K_input  = document.getElementById("K");
-				F0_input = document.getElementById("F0");
-				Q_input  = document.getElementById("Q");
-				serie_input = document.getElementById("serie");
-				
-				lockR = document.getElementById("lockR").checked;
-				lockC = document.getElementById("lockC").checked;
-				
-				ctx = document.getElementById("cnv").getContext("2d");
-				
+				var H_div = document.getElementById("H");
+				var R1_input = document.getElementById("R1");
+				var R2_input = document.getElementById("R2");
+				var C1_input = document.getElementById("C1");
+				var C2_input = document.getElementById("C2");
+				var Rf_input = document.getElementById("Rf");
+				var K_input  = document.getElementById("K");
+				var F0_input = document.getElementById("F0");
+				var Q_input  = document.getElementById("Q");
+				var serie_input = document.getElementById("serie");
+
+				var lockR = document.getElementById("lockR").checked;
+				var lockC = document.getElementById("lockC").checked;
+
+				var ctx = document.getElementById("cnv").getContext("2d");
+
 				//Change picture
-				topo = document.getElementById("topology").value;
+				var topo = document.getElementById("topology").value;
 				document.getElementById("circuit").src = topo+".png";
-				
+
 				//Change configuration
 				if(type == "config"){
 					R2_input.disabled = lockR;
 					C2_input.disabled = lockC;
-					
+
 					switch(topo){
 						case "SKlp":
 							Rf_input.disabled = true;
@@ -70,22 +70,22 @@
 						break;
 					}
 				}
-				
+
 				//Get fields values
-				R1 = Math.abs(floatOf(R1_input, 3.3 )) * 1e3 ;
-				R2 = Math.abs(floatOf(R2_input, 3.3 )) * 1e3 ;
-				C1 = Math.abs(floatOf(C1_input, 4.7)) * 1e-9;
-				C2 = Math.abs(floatOf(C2_input, 4.7)) * 1e-9;
-				Rf = Math.abs(floatOf(Rf_input, 1  )) * 1e3 ;
-				K  = Math.abs(floatOf(K_input , 2.5  )) * 1e0 ;
-				F0 = Math.abs(floatOf(F0_input, 10  )) * 1e3 ;
-				Q  = floatOf(Q_input , 2)* 1e0 ;
-				w0 = 2*Math.PI*F0;
-				
+				var R1 = Math.abs(floatOf(R1_input, 3.3 )) * 1e3 ;
+				var R2 = Math.abs(floatOf(R2_input, 3.3 )) * 1e3 ;
+				var C1 = Math.abs(floatOf(C1_input, 4.7)) * 1e-9;
+				var C2 = Math.abs(floatOf(C2_input, 4.7)) * 1e-9;
+				var Rf = Math.abs(floatOf(Rf_input, 1  )) * 1e3 ;
+				var K  = Math.abs(floatOf(K_input , 2.5  )) * 1e0 ;
+				var F0 = Math.abs(floatOf(F0_input, 10  )) * 1e3 ;
+				var Q  = floatOf(Q_input , 2)* 1e0 ;
+				var w0 = 2*Math.PI*F0;
+
 				//Match the values
 				if(lockR) R2 = R1;
 				if(lockC) C2 = C1;
-				
+
 				//Compute components
 				if(type == "spec"){
 					switch(topo){
@@ -116,18 +116,17 @@
 						break;
 					}
 				}
-				
+
 				//Get closest resistance serie
 				if(type == "serie"){
-					s = floatOf(serie_input, 12);
-					serie = getResistorSerie(s);
-					
+					var s = floatOf(serie_input, 12);
+					var serie = getResistorSerie(s);
+
 					R1 = closestInList(serie, R1);
-					R2 = closestInList(serie, R2);	
-					Rf = closestInList(serie, Rf);					
-					
+					R2 = closestInList(serie, R2);
+					Rf = closestInList(serie, Rf);
 				}
-				
+
 				//Compute spec
 				if(type == "comp" || type == "config"){
 					switch(topo){
@@ -145,7 +144,7 @@
 						break;
 					}
 				}
-				
+
 				//Create function
 				switch(topo){
 					case "SKlp":
@@ -158,7 +157,7 @@
 						fct = function(p) { return 1;}
 					break;
 				}
-				
+
 				//Set fields (1/Infinity => NaN => 0)
 				var acc = 2;
 				F0 = w0/(2*Math.PI);
@@ -170,23 +169,24 @@
 				setValue(K_input , (K ||0)* 1e0 , acc);
 				setValue(F0_input, (F0||0)* 1e-3, acc);
 				setValue(Q_input , (Q ||0)* 1e0 , acc);
-				
+
 				drawFct(ctx, fct, w0, 300, 230);
 			}
-			
+
 		function drawFct(ctx, fct, w0, xSize, ySize){
 			var p, gain;
 			var Ca,Cg;
 			var gmax, gmin;
 			var fmax, fmin;
-			fmin = 0;
-			fmax = Math.min(200e3, w0*2);
-			
+			fmin = 2*Math.PI*10; //10Hz
+			fmax = (w0<200e3) ? 200e3:(w0+50e3); //~20kHz
+
 			//Auto-set range
 			for(Ca=0; Ca<xSize; Ca++){
-				p = math.complex('i').mul(map(Ca, 0, xSize-1, fmin, fmax));
-				gain = 20*Math.log(fct(p).abs());
-				
+				p = map(Ca, 0, xSize-1, Math.log10(fmin), Math.log10(fmax));
+				p = math.complex('i').mul(Math.pow(10, p));
+				gain = 20*Math.log10(fct(p).abs());
+
 				//Setup min and max
 				if(Ca==0){
 					gmax=gain;
@@ -197,38 +197,47 @@
 					gmin = Math.min(gmin, gain);
 				}
 			}
-			
+			gmax = Math.max(gmax, 20);
+			gmin = Math.min(gmin, -80);
+
 			//Actual drawing
+				//Zero lines
 			ctx.fillStyle = "white";
 			ctx.fillRect(0, 0, xSize, ySize);
 			ctx.fillStyle = "darkred";
 			ctx.fillRect(0, ySize-map(0, gmin, gmax, 0, ySize-1)-1, xSize, 1);
 			ctx.fillStyle = "darkblue";
 			ctx.fillRect(0, ySize/2, xSize, 1);
+				//Semi-Log scale
 			for(Ca=0; Ca<xSize; Ca++){
-				p = math.complex('i').mul(map(Ca, 0, xSize-1, fmin, fmax));
+				p = map(Ca, 0, xSize-1, Math.log10(fmin), Math.log10(fmax));
+				p = math.complex('i').mul(Math.pow(10, p));
 				H = fct(p);
-				
-				gain  = 20*Math.log(H.abs());
+
+				gain  = 20*Math.log10(H.abs());
 				phase = Math.atan(H.im/H.re);
-				
+
 				Cg = map(gain, gmin, gmax, 0, ySize-1);
 				Cp = map(phase, -Math.PI/2, Math.PI/2, 0, ySize-1);
-				
+
 				ctx.fillStyle = "red";
 				ctx.fillRect(Ca, ySize-Cg-1, 1, -1);
 				ctx.fillStyle = "blue";
 				ctx.fillRect(Ca, ySize-Cp-1, 1, -1);
 			}
+				//Min/Max
+			ctx.fillStyle = "darkred";
+			ctx.fillText(gmax.toPrecision(2), 5, 15);
+			ctx.fillText(gmin.toPrecision(2), 5, ySize-5);
 		}
-			
+
 		</script>
 	</head>
-	
+
 	<body onload="change('config');">
 		<div>
 			<div style="display:inline-block;">
-			<table>
+			<table style="width: 240px;">
 				<tr><td colspan="5">
 				<select id="topology" onchange="change('config');">
 					<option value="SKlp">Sallen-key, low-pass</option>
@@ -236,9 +245,9 @@
 					<option value="SKbp">Sallen-key, band-pass</option>
 				</select>
 				</td></tr>
-				
+
 				<tr><td>H(p)=</td><td colspan="4" id="H"></td></tr>
-				
+
 				<tr style="border-top-style: double;"></td><td>R1</td><td>R2</td><td>C1</td><td>C2</td><td>Rf</td></tr>
 				<tr style="height:16px;">
 						<td colspan="2"><input type="checkbox" id="lockR" onchange="change('config');"/></td>
@@ -248,13 +257,13 @@
 						<td><input type="text" id="C1" onkeyup="timer('comp');"/></td>
 						<td><input type="text" id="C2" onkeyup="timer('comp');"/></td>
 						<td><input type="text" id="Rf" onkeyup="timer('comp');"/></td></tr>
-						
+
 				<tr style="border-top-style: double;"><td colspan="3">K=1+Rb/Ra=</td><td colspan="2"><input type="text" id="K" onkeyup="timer('comp');"/></td></tr>
-				
+
 				<tr style="border-top-style: double;"><td colspan="2">F0</td><td></td><td colspan="2">Q</td></tr>
 				<tr><td colspan="2"><input type="text" id="F0" onkeyup="timer('spec');"/></td><td></td>
 				    <td colspan="2"><input type="text" id="Q" onkeyup="timer('spec');"/></td></tr>
-						
+
 				<tr style="border-top-style: double;"><td colspan="5">
 					Get closest <select id="serie" onchange="change('serie');">
 						<option value="6">E6</option>
@@ -275,4 +284,3 @@
 		(Resistors in kohms, Capacitors in nF, Frequencies in kHz)
 	</body>
 </html>
-				
