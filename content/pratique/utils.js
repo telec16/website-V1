@@ -23,8 +23,8 @@ function getChildsByTagName(div, childTagName)
 
 function fillWithSpaces(inStr, space)
 {
-	outStr = inStr;
-	space = (space-inStr.length);
+	var outStr = inStr;
+	var space = (space-inStr.length);
 	
 	for(var i=0 ; i<space; i++)
 		outStr += " ";
@@ -109,22 +109,43 @@ function unsetDragListeners(cnv, callbck){
  * Map val from f to t
  */
 function map(val, fMin, fMax, tMin, tMax){
-	val = (val<fMin) ? fMin:((val>fMax) ? fMax:val); //Clip
+	var val = (val<fMin) ? fMin:((val>fMax) ? fMax:val); //Clip
 	return ((val-fMin)/(fMax-fMin))*(tMax-tMin)+tMin; //Map
 }
 
 			
-function closestInList(list, value){
-	v = parseFloat((value).toExponential().split("e")[0]);
-	p = parseFloat((value).toExponential().split("e")[1]);
-	
-	minError=1;
-	c=0;
+function closestKeyInList(list, key){
+	return closestInListAbs(Object.keys(list), key);
+}
+
+function closestInListAbs(list, value){
+	var minError=Math.abs((value-list[0])/list[0]);
+	var c=parseFloat(list[0]);
 	
 	for(let l of list){
+		l = parseFloat(l)
+		var e = Math.abs((value-l)/l);
+		
+		if(e < minError){
+			minError = e;
+			c = l;
+		}
+	}
 	
+	return c;
+}
+
+function closestInList(list, value){
+	var v = parseFloat((value).toExponential().split("e")[0]);
+	var p = parseFloat((value).toExponential().split("e")[1]);
+	
+	var minError=1;
+	var c=0;
+	
+	for(let l of list){
+		l = parseFloat(l)
 		l = parseFloat((l).toExponential().split("e")[0]);
-		e = Math.abs((v-l)/l);
+		var e = Math.abs((v-l)/l);
 		
 		if(e < minError){
 			minError = e;
@@ -136,7 +157,7 @@ function closestInList(list, value){
 }
 
 function getResistorSerie(s){
-	E = {"6":  [10, 15, 22, 33, 47, 68],
+	var E = {"6":  [10, 15, 22, 33, 47, 68],
 		 "12": [10, 12, 15, 18, 22, 27, 33, 39, 47, 56, 68, 82],
 		 "24": [10, 11, 12, 13, 15, 16, 18, 20, 22, 24, 27, 30, 33, 36, 39, 43, 47, 51, 56, 62, 68, 75, 82, 91],
 		 "48": [100, 105, 110, 115, 121, 127, 133, 140, 147, 154, 162, 169, 178, 187, 196, 205, 215, 226, 237, 249, 261, 274, 287, 301, 316, 332, 348, 365, 383, 402, 422, 442, 464, 487, 511, 536, 562, 590, 619, 649, 681, 715, 750, 787, 825, 866, 909, 953],

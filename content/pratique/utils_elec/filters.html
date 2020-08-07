@@ -337,7 +337,10 @@
 						break;
 						case "chebychev":
 							ripple_input.disabled = false;
-							if(order == 2) Q = 1.305;
+							var Rdb = 10*Math.log10(ripple**2 + 1);
+							var Q2 = {0.01: 0.7247, 0.1: 0.7673, 0.25: 0.8093, 0.5: 0.8638, 1: 0.9564, 3: 1.305};
+							var key = closestKeyInList(Q2, Rdb);
+							if(order == 2) Q = Q2[key];
 						break;
 					}
 
@@ -347,7 +350,7 @@
 				}
 
 				setValue(order_input, order||0, 0);
-				setValue(ripple_input, ripple||0, 0);
+				setValue(ripple_input, ripple||0, 3);
 		}
 
 		</script>
@@ -369,7 +372,7 @@
 					<tr><td>2nd order</td><td>The most common filter</td><td>Generic filter, see variants below</td></tr>
 					<tr><td>Butterworth</td><td>Quite selective filter, really good magnitude response (sharp and straight)</td><td>Low distortion and selective application, but take care of the phase!</td></tr>
 					<tr><td>Bessel</td><td>Not really selective, smooth phase transition</td><td>Really good in audio path</td></tr>
-					<tr><td>Chebychev</td><td>Really selective, but ripple in the bandwidth (see Chebychev type 2 for a flat response)</td><td>Not good for audio, but can be used for signal processing.</td></tr>
+					<tr><td>Chebychev</td><td>Really selective, but ripple in the pass band (see Chebychev type 2 for a flat response)</td><td>Not good for audio, but can be used for signal processing.</td></tr>
 					<tr><td rowspan="1" class="side-text">Elliptic</td><td>Cauer</td><td>More selective than Chebychev, but the attenuation is limited</td><td>?</td></tr>
 				</tbody>
 			</table>
@@ -391,7 +394,7 @@
 
 		<div>
 			<p>
-			Select a function to get the corresponding resonance (not complete, <a href="https://www.analog.com/media/en/training-seminars/design-handbooks/Basic-Linear-Design/Chapter8.pdf">go here (p.48)</a>, for more info):
+			Select a function to get the corresponding resonance (not complete, <a href="https://www.analog.com/media/en/training-seminars/design-handbooks/Basic-Linear-Design/Chapter8.pdf">go here (p.46)</a>, for more info):
 			</p>
 			<table>
 				<tr><td>Function</td><td>Order</td><td>Ripple</td></tr>
