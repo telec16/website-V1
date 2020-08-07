@@ -51,7 +51,14 @@
 					switch(topo){
 						case "SKlp":
 							Rf_input.disabled = true;
-							H_div.innerHTML = "";
+							if(!lockR && !lockC)
+								H_div.innerHTML = "K/(1+p(C2(R1+R2)+R1C1(1-K))+R1R2C1C2p²)";
+							if(lockR && !lockC)
+								H_div.innerHTML = "K/(1+R*p(2*C2+C1(1-K))+C1C2(R*p)²)";
+							if(!lockR && lockC)
+								H_div.innerHTML = "K/(1+C*p(R2+R1(2-K))+R1R2(C*p)²)";
+							if(lockR && lockC)
+								H_div.innerHTML = "K/(1+RCp(3-K)+(RCp)²)";
 						break;
 						case "SKhp":
 							Rf_input.disabled = true;
@@ -65,14 +72,14 @@
 				}
 				
 				//Get fields values
-				R1 = Math.abs(floatOf(R1_input, 10 )) * 1e3 ;
-				R2 = Math.abs(floatOf(R2_input, 10 )) * 1e3 ;
+				R1 = Math.abs(floatOf(R1_input, 3.3 )) * 1e3 ;
+				R2 = Math.abs(floatOf(R2_input, 3.3 )) * 1e3 ;
 				C1 = Math.abs(floatOf(C1_input, 4.7)) * 1e-9;
 				C2 = Math.abs(floatOf(C2_input, 4.7)) * 1e-9;
 				Rf = Math.abs(floatOf(Rf_input, 1  )) * 1e3 ;
-				K  = Math.abs(floatOf(K_input , 1  )) * 1e0 ;
-				F0 = Math.abs(floatOf(F0_input, 1  )) * 1e3 ;
-				Q  = floatOf(Q_input , 1.41)* 1e0 ;
+				K  = Math.abs(floatOf(K_input , 2.5  )) * 1e0 ;
+				F0 = Math.abs(floatOf(F0_input, 10  )) * 1e3 ;
+				Q  = floatOf(Q_input , 2)* 1e0 ;
 				w0 = 2*Math.PI*F0;
 				
 				//Match the values
@@ -170,10 +177,10 @@
 		function drawFct(ctx, fct, w0, xSize, ySize){
 			var p, gain;
 			var Ca,Cg;
-			var max, min;
+			var gmax, gmin;
 			var fmax, fmin;
-			fmin = 0//w0-w0*3/4;
-			fmax = 200e3//w0+w0*3/4;
+			fmin = 0;
+			fmax = Math.min(200e3, w0*2);
 			
 			//Auto-set range
 			for(Ca=0; Ca<xSize; Ca++){
@@ -182,24 +189,36 @@
 				
 				//Setup min and max
 				if(Ca==0){
-					max=gain;
-					min=gain;
+					gmax=gain;
+					gmin=gain;
 				}
 				else{
-					max = Math.max(max, gain);
-					min = Math.min(min, gain);
+					gmax = Math.max(gmax, gain);
+					gmin = Math.min(gmin, gain);
 				}
 			}
 			
 			//Actual drawing
 			ctx.fillStyle = "white";
 			ctx.fillRect(0, 0, xSize, ySize);
-			ctx.fillStyle = "black";
+			ctx.fillStyle = "darkred";
+			ctx.fillRect(0, ySize-map(0, gmin, gmax, 0, ySize-1)-1, xSize, 1);
+			ctx.fillStyle = "darkblue";
+			ctx.fillRect(0, ySize/2, xSize, 1);
 			for(Ca=0; Ca<xSize; Ca++){
 				p = math.complex('i').mul(map(Ca, 0, xSize-1, fmin, fmax));
-				gain = 20*Math.log(fct(p).abs());
-				Cg = map(gain, min, max, 0, ySize-1);
+				H = fct(p);
+				
+				gain  = 20*Math.log(H.abs());
+				phase = Math.atan(H.im/H.re);
+				
+				Cg = map(gain, gmin, gmax, 0, ySize-1);
+				Cp = map(phase, -Math.PI/2, Math.PI/2, 0, ySize-1);
+				
+				ctx.fillStyle = "red";
 				ctx.fillRect(Ca, ySize-Cg-1, 1, -1);
+				ctx.fillStyle = "blue";
+				ctx.fillRect(Ca, ySize-Cp-1, 1, -1);
 			}
 		}
 			
