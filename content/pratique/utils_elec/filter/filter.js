@@ -229,7 +229,7 @@ function change(type){
 	setValue(Q_input , (Q ||0)* 1e0 , acc);
 	setFloat(maxg_input, maxg, acc);
 
-	drawFct(ctx, fct, w0, 300, 230);
+	drawFct(ctx, fct, w0, 400, 280);
 }
 
 
