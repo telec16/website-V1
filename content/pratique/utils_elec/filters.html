@@ -61,6 +61,8 @@
 				handler = setTimeout(change, 500, type);
 			}
 
+			var acc = 3;
+
 			function change(type){
 				var H_div = document.getElementById("H");
 				var R1_input = document.getElementById("R1");
@@ -230,7 +232,6 @@
 				}
 
 				//Set fields (1/Infinity => NaN => 0)
-				var acc = 2;
 				F0 = w0/(2*Math.PI);
 				setValue(R1_input, (R1||0)* 1e-3, acc);
 				setValue(R2_input, (R2||0)* 1e-3, acc);
@@ -305,15 +306,59 @@
 			ctx.fillText("-π/2", xSize-25, ySize-5);
 		}
 
+		function computeQ(){
+				var tr_div = document.getElementById("resonances");
+				var order_input = document.getElementById("order");
+				var ripple_input = document.getElementById("ripple");
+
+				var fun = document.getElementById("function").value;
+				var order = Math.abs(floatOf(order_input, 2));
+				var ripple = Math.abs(floatOf(ripple_input, 0));
+				order = Math.max(2, order);
+
+				//Clean up
+				for(var td of [...tr_div.getElementsByTagName("td")]){
+					tr_div.removeChild(td);
+				}
+
+				//Fill up
+				for(var o=1; o<=order/2; o++){
+					var Q = NaN;
+
+					switch(fun){
+						case "bessel":
+							ripple_input.disabled = true;
+							if(order == 2) Q = 1/(Math.sqrt(3));
+						break;
+						case "butterworth":
+							ripple_input.disabled = true;
+							var phi = Math.PI/(2*order) * (order + 2*o - 1);
+							Q = 1/(-2*Math.cos(phi));
+						break;
+						case "chebychev":
+							ripple_input.disabled = false;
+							if(order == 2) Q = 1.305;
+						break;
+					}
+
+					var td = document.createElement("td");
+					setFloat(td, Q, acc);
+					tr_div.appendChild(td);
+				}
+
+				setValue(order_input, order||0, 0);
+				setValue(ripple_input, ripple||0, 0);
+		}
+
 		</script>
 	</head>
 
-	<body onload="change('config');">
+	<body onload="change('config'); computeQ();">
 		<div>
 			<p>
 			When designing a filter, you have two mains things to consider: what function do you need, and how you will implement it. Here are the most commons choices:
 			</p>
-			
+
 			<table class="list">
 				<thead>
 					<tr><th colspan="4">Functions</th></tr>
@@ -328,7 +373,7 @@
 					<tr><td rowspan="1" class="side-text">Elliptic</td><td>Cauer</td><td>More selective than Chebychev, but the attenuation is limited</td><td>?</td></tr>
 				</tbody>
 			</table>
-			
+
 			<table class="list">
 				<thead>
 					<tr><th colspan="3">Topologies</th></tr>
@@ -343,13 +388,13 @@
 				</tbody>
 			</table>
 		</div>
-		
+
 		<div>
 			<p>
-			Select a function to get the corresponding resonance:
+			Select a function to get the corresponding resonance (not complete, <a href="https://www.analog.com/media/en/training-seminars/design-handbooks/Basic-Linear-Design/Chapter8.pdf">go here (p.48)</a>, for more info):
 			</p>
 			<table>
-				<tr><td>Function</td><td>Order</td><td>Resonances</td></tr>
+				<tr><td>Function</td><td>Order</td><td>Ripple</td></tr>
 				<tr id="resonances">
 					<th><select id="function" onchange="computeQ();">
 								<option value="bessel">Bessel</option>
@@ -357,11 +402,11 @@
 								<option value="chebychev">Chebychev</option>
 							</select></th>
 					<th><input type="number" id="order" min="2" step="1" value="2"  onchange="computeQ();"/></th>
-					<td></td>
+					<th><input type="number" id="ripple" min="0" step="0.01" value="1"  onchange="computeQ();"/></th>
 				</tr>
 			</table>
 		</div>
-		
+
 		<div>
 			<p>
 			Try it out!
