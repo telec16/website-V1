@@ -158,7 +158,7 @@ function change(type){
 			break;
 			case "LClp":
 			case "LChp":
-				R1 = 1/(w0**2 * C1);
+				C1 = 1/(w0**2 * R1);
 			break;
 			case "SKlp":
 				if(!lockR)
