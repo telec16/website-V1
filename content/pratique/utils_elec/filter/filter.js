@@ -11,6 +11,7 @@ function change(type){
 	 * Initialize fields
 	 */
 	var H_div = document.getElementById("H");
+	var R1_div   = document.getElementById("R1_label");
 	var R1_input = document.getElementById("R1");
 	var R2_input = document.getElementById("R2");
 	var C1_input = document.getElementById("C1");
@@ -21,10 +22,10 @@ function change(type){
 	var F0_input = document.getElementById("F0");
 	var Q_input  = document.getElementById("Q");
 	var serie_input = document.getElementById("serie");
+	var lockR_input  = document.getElementById("lockR" );
+	var lockRf_input = document.getElementById("lockRf");
+	var lockC_input  = document.getElementById("lockC" );
 
-	var lockR  = document.getElementById("lockR" ).checked;
-	var lockRf = document.getElementById("lockRf").checked;
-	var lockC  = document.getElementById("lockC" ).checked;
 
 	//Canvas to draw the graph
 	var ctx = document.getElementById("cnv").getContext("2d");
@@ -32,9 +33,12 @@ function change(type){
 	//Change the schematic image
 	var topo = document.getElementById("topology").value;
 	document.getElementById("circuit").src = "./filter/"+topo+".png";
+	//Config variables
+	var is1stOrder = topo.indexOf("RC") == 0 || topo.indexOf("LC") == 0;
+	var isL = topo.indexOf("L") == 0;
 
 	//Get fields values
-	var R1 = Math.abs(floatOf(R1_input, 10 )) * 1e3 ;
+	var R1 = Math.abs(floatOf(R1_input, 10 )) * (isL ? 1e-3:1e3) ;
 	var R2 = Math.abs(floatOf(R2_input, 10 )) * 1e3 ;
 	var C1 = Math.abs(floatOf(C1_input, 4.7)) * 1e-9;
 	var C2 = Math.abs(floatOf(C2_input, 4.7)) * 1e-9;
@@ -42,18 +46,47 @@ function change(type){
 	var K  = Math.abs(floatOf(K_input , 2.8)) * 1e0 ;
 	var F0 = Math.abs(floatOf(F0_input, 10 )) * 1e3 ;
 	var Q  = floatOf(Q_input , 2)* 1e0 ;
+	var lockR  = lockR_input.checked;
+	var lockRf = lockRf_input.checked;
+	var lockC  = lockC_input.checked;
+
 	var w0 = 2*Math.PI*F0;
 	var maxg = 3;
+
+	//Range
+	K = Math.max(1, K);
 
 
 	/*
 	 * Update configuration
 	 */
 	if(type == "config"){
+		Rf_input.disabled = is1stOrder;
+		R2_input.disabled = is1stOrder;
+		C2_input.disabled = is1stOrder;
+		Q_input.disabled = is1stOrder;
+		lockRf_input.disabled = is1stOrder;
+		lockR_input.disabled = is1stOrder;
+		lockC_input.disabled = is1stOrder;
+
+		R1_div.innerHTML = isL ? "L1" : "R1";
+
 		switch(topo){
+			case "RClp":
+				H_div.innerHTML = "K/(1+RC.p)";
+			break;
+			case "RChp":
+				H_div.innerHTML = "K.p/(1/(RC)+p)";
+			break;
+			case "LClp":
+				H_div.innerHTML = "K/(1+LC.p²)";
+			break;
+			case "LChp":
+				H_div.innerHTML = "K.p²/(1/(LC)+p²)";
+			break;
 			case "SKlp":
 				Rf_input.disabled = true;
-				document.getElementById("lockRf").disabled = true;
+				lockRf_input.disabled = true;
 				if(!lockR && !lockC)
 					H_div.innerHTML = "K/(1+(C2(R1+R2)+R1C1(1-K)).p+R1R2C1C2.p²)";
 				if(lockR && !lockC)
@@ -65,7 +98,7 @@ function change(type){
 			break;
 			case "SKhp":
 				Rf_input.disabled = true;
-				document.getElementById("lockRf").disabled = true;
+				lockRf_input.disabled = true;
 				if(!lockR && !lockC)
 					H_div.innerHTML = "K.p²/(1/(R1R2C1C2)+(R1(C1+C2)+R2C2(1-K))/(R1R2C1C2).p+p²)";
 				if(lockR && !lockC)
@@ -77,7 +110,7 @@ function change(type){
 			break;
 			case "SKbp":
 				Rf_input.disabled = false;
-				document.getElementById("lockRf").disabled = false;
+				lockRf_input.disabled = false;
 				if(!lockR && !lockC)
 					H_div.innerHTML = "K/(R1C1).p/((R1+Rf)/(R1R2C1C2Rf)+(Rf(R1(C1+C2)+R2C2)+R1R2C2(1-K))/(R1R2C1C2Rf).p+p²)";
 				if(lockR && !lockC && !lockRf)
@@ -93,15 +126,17 @@ function change(type){
 			break;
 		}
 
-		if(!lockR) {
-			lockRf = document.getElementById("lockRf").checked = false;
-			document.getElementById("lockRf").disabled = true;
-		}
-		if(lockRf)
-			Rf_input.disabled = true;
+		if(!is1stOrder) {
+			if(!lockR) {
+				lockRf = lockRf_input.checked = false;
+				lockRf_input.disabled = true;
+			}
+			if(lockRf)
+				Rf_input.disabled = true;
 
-		R2_input.disabled = lockR;
-		C2_input.disabled = lockC;
+			R2_input.disabled = lockR;
+			C2_input.disabled = lockC;
+		}
 	}
 
 
@@ -117,6 +152,14 @@ function change(type){
 	 */
 	if(type == "spec"){
 		switch(topo){
+			case "RClp":
+			case "RChp":
+				R1 = 1/(w0*C1);
+			break;
+			case "LClp":
+			case "LChp":
+				R1 = 1/(w0**2 * C1);
+			break;
 			case "SKlp":
 				if(!lockR)
 					R1 = 1/(w0**2) * 1/(R2*C1*C2);
@@ -126,7 +169,6 @@ function change(type){
 				//C1 = 1/(w0**2) * 1/(R1*R2*C1);
 				//C2 = 1/(w0**2) * 1/(R1*R2*C2);
 				K = 1 - ( (1/(Q*w0) - C2*(R1+R2)) / (R1*C1) );
-				maxg = 1 + C2*(R1+R2) / (R1*C1);
 			break;
 			case "SKhp":
 				if(!lockR)
@@ -134,7 +176,6 @@ function change(type){
 				else
 					R1 = R2 = 1/(w0 * Math.sqrt(C1*C2));
 				K = 1 - ( (1/(Q*w0) - R1*(C1+C2)) / (R2*C2) );
-				maxg = 1 + R1*(C1+C2) / (R2*C2);
 			break;
 			case "SKbp":
 				if(!lockR)
@@ -144,7 +185,6 @@ function change(type){
 				else
 					R1 = R2 = Rf = 1/(w0 * Math.sqrt(C1*C2/2));
 				K = 1 - ( (1/(Q*w0/(R1+Rf)) - Rf*(R1*(C1+C2) + R2*C2)) / (R1*R2*C2) );
-				maxg = 1 + Rf*(R1*(C1+C2) + R2*C2) / (R1*R2*C2);
 			break;
 		}
 	}
@@ -165,6 +205,12 @@ function change(type){
 	 * Compute maximum gain
 	 */
 	switch(topo){
+		case "LClp":
+		case "LChp":
+		case "RClp":
+		case "RChp":
+			maxg = NaN;
+		break;
 		case "SKlp":
 			maxg = 1 + C2*(R1+R2) / (R1*C1);
 		break;
@@ -181,6 +227,14 @@ function change(type){
 	 */
 	if(type == "comp" || type == "config"){
 		switch(topo){
+			case "RClp":
+			case "RChp":
+				w0 = 1/(R1*C1);
+			break;
+			case "LClp":
+			case "LChp":
+				w0 = 1/Math.sqrt(R1*C1);
+			break;
 			case "SKlp":
 				w0 = 1/Math.sqrt(R1*R2*C1*C2);
 				Q = 1/w0 * 1/(C2*(R1+R2) + R1*C1*(1-K));
@@ -201,6 +255,22 @@ function change(type){
 	 * Create the transfer function
 	 */
 	switch(topo){
+		case "RClp":
+			//K/(1 + p/w0)
+			fct = function(p) { return math.complex(K).div( p.div(w0). add(1) );}
+		break;
+		case "RChp":
+			//K*p/(w0 + p)
+			fct = function(p) { return p.mul(K).div( p. add(w0) );}
+		break;
+		case "LClp":
+			//K/(1 + (p/w0)**2)
+			fct = function(p) { return math.complex(K).div( p.div(w0).pow(2). add(1) );}
+		break;
+		case "LChp":
+			//K*p**2/(w0**2 + p**2)
+			fct = function(p) { return p.pow(2).mul(K).div( p.pow(2). add(w0**2) );}
+		break;
 		case "SKlp":
 			//K/(1 + p/(Q*w0) + (p/w0)**2)
 			fct = function(p) { return math.complex(K).div( p.div(w0).pow(2). add(p.div(Q*w0)). add(1) );}
@@ -219,7 +289,7 @@ function change(type){
 	 * Update fields (1/Infinity => NaN => 0)
 	 */
 	F0 = w0/(2*Math.PI);
-	setValue(R1_input, (R1||0)* 1e-3, acc);
+	setValue(R1_input, (R1||0)* (isL ? 1e3:1e-3), acc);
 	setValue(R2_input, (R2||0)* 1e-3, acc);
 	setValue(C1_input, (C1||0)* 1e9 , acc);
 	setValue(C2_input, (C2||0)* 1e9 , acc);

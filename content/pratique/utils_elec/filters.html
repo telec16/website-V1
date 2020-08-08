@@ -25,19 +25,17 @@
 			<table class="data">
 				<tr><td colspan="5">
 				<select id="topology" onchange="change('config');">
-					<option value="RClp" disabled>RC, low-pass</option>
-					<option value="RChp" disabled>RC, high-pass</option>
-					<option value="LClp" disabled>LC, low-pass</option>
-					<option value="LChp" disabled>LC, high-pass</option>
-					<option value="LCbp" disabled>LC, band-pass</option>
-					<option value="LCbs" disabled>LC, band-stop</option>
+					<option value="RClp">RC, low-pass</option>
+					<option value="RChp">RC, high-pass</option>
+					<option value="LClp">LC, low-pass</option>
+					<option value="LChp">LC, high-pass</option>
 					<option value="SKlp" selected>Sallen-key, low-pass</option>
 					<option value="SKhp">Sallen-key, high-pass</option>
 					<option value="SKbp">Sallen-key, band-pass</option>
 				</select>
 				</td></tr>
 
-				<tr style="border-top-style: double;"></td><td>R1</td><td>R2</td><td>C1</td><td>C2</td><td>Rf</td></tr>
+				<tr style="border-top-style: double;"></td><td id="R1_label">R1</td><td>R2</td><td>C1</td><td>C2</td><td>Rf</td></tr>
 				<tr style="height:16px;">
 						<td colspan="2"><input type="checkbox" id="lockR"  onchange="change('config');"/></td>
 						<td colspan="2"><input type="checkbox" id="lockC"  onchange="change('config');"/></td>
